@@ -1,0 +1,2584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>灯下 · 一个没有名字的村子</title>
+<style>
+:root{
+  --ink:#070910;
+  --ink2:#0e1219;
+  --paper:#e8dcc2;
+  --gold:#c8a45c;
+  --gold-dim:#8a7136;
+  --jade:#79c2b4;
+  --blood:#c8543f;
+  --line:rgba(200,164,92,.22);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 620px at 50% -12%, #2b2418 0%, rgba(20,18,14,0) 60%),
+    radial-gradient(700px 500px at 50% 108%, #14201f 0%, rgba(20,18,14,0) 62%),
+    linear-gradient(180deg,#0b0d12 0%,#070810 60%,#0a0c11 100%);
+  color:var(--paper);
+  font-family:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",Georgia,serif;
+  display:flex;justify-content:center;
+  min-height:100%;padding:18px 12px 26px;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:6;opacity:.05;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  mix-blend-mode:screen;
+}
+.wrap{width:100%;max-width:800px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2}
+
+/* 顶栏 */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 4px}
+.brand{font-size:19px;letter-spacing:.42em;color:var(--gold);text-shadow:0 0 24px rgba(200,164,92,.45)}
+.brand small{display:block;font-size:10.5px;letter-spacing:.22em;color:rgba(232,220,194,.42);margin-top:3px}
+.topbtns{display:flex;gap:7px}
+.ghost{
+  background:rgba(200,164,92,.05);border:1px solid var(--line);color:rgba(232,220,194,.78);
+  padding:6px 11px;border-radius:9px;font-family:inherit;font-size:12.5px;letter-spacing:.12em;cursor:pointer;
+  transition:.18s;
+}
+.ghost:hover{background:rgba(200,164,92,.16);color:var(--paper);border-color:rgba(200,164,92,.5)}
+
+/* 状态栏 */
+.hud{
+  border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(180deg,rgba(232,220,194,.055),rgba(232,220,194,.012));
+  padding:11px 14px;display:flex;gap:14px 22px;flex-wrap:wrap;align-items:center;}
+.meter{min-width:132px;flex:1 1 132px}
+.meter .lab{display:flex;justify-content:space-between;font-size:11.5px;letter-spacing:.2em;color:rgba(232,220,194,.55);margin-bottom:6px}
+.meter .lab b{font-weight:400;color:rgba(232,220,194,.85);letter-spacing:.06em}
+.bar{height:5px;border-radius:4px;background:rgba(232,220,194,.1);overflow:hidden}
+.bar i{display:block;height:100%;width:50%;transition:width .5s ease;border-radius:4px}
+#hpHud i{background:linear-gradient(90deg,#8d3a2c,#d9704f);box-shadow:0 0 12px rgba(217,112,79,.55)}
+#spHud i{background:linear-gradient(90deg,#2f6f68,#7fd0c2);box-shadow:0 0 12px rgba(127,208,194,.5)}
+.meter.stat{flex:0 0 auto;min-width:0;text-align:center}
+.meter.stat .lab{justify-content:center;gap:8px}
+.meter.stat .lab b{color:var(--gold);font-size:15px;letter-spacing:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1 1 100%}
+.chip{
+  font-size:11.5px;letter-spacing:.1em;padding:3px 9px;border-radius:999px;
+  border:1px solid rgba(200,164,92,.3);color:rgba(232,220,194,.8);background:rgba(200,164,92,.07);
+}
+.chip.empty{border-color:rgba(232,220,194,.12);color:rgba(232,220,194,.28);background:none}
+
+/* 正文卷轴 */
+.scroll{
+  position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  background:linear-gradient(180deg,#101319,#0b0d13 70%);
+  box-shadow:0 0 70px rgba(200,164,92,.06),inset 0 0 90px rgba(0,0,0,.6);
+  padding:20px 22px 22px;min-height:290px;
+}
+.scroll::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(360px 260px at 50% 0%,rgba(200,164,92,.13),rgba(0,0,0,0) 70%);
+}
+.sceneTitle{
+  font-size:13px;letter-spacing:.34em;color:var(--gold);opacity:.85;
+  padding-bottom:10px;margin-bottom:14px;border-bottom:1px dashed rgba(200,164,92,.2);
+}
+.sceneTitle::before{content:"〔 "}
+.sceneTitle::after{content:" 〕"}
+#text{font-size:16.5px;line-height:2.0;letter-spacing:.045em;color:#e3d7bd;white-space:pre-wrap;min-height:170px}
+#text p{margin:0 0 1.05em}
+#text p.say{color:#f0e6cf}
+#text p.sys{color:rgba(127,208,194,.92);font-size:14.5px;letter-spacing:.1em}
+#text p.gain{color:var(--gold);font-size:14.5px;letter-spacing:.1em}
+.caret{display:inline-block;width:.55em;color:var(--gold);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.hint{position:absolute;right:16px;bottom:10px;font-size:11px;letter-spacing:.14em;color:rgba(232,220,194,.3)}
+
+/* 选项 */
+#choices{display:flex;flex-direction:column;gap:9px}
+.choice{
+  position:relative;text-align:left;font-family:inherit;cursor:pointer;
+  background:linear-gradient(90deg,rgba(200,164,92,.09),rgba(200,164,92,.025));
+  border:1px solid var(--line);border-radius:12px;
+  color:#ebe0c8;padding:13px 16px 13px 40px;font-size:15.5px;letter-spacing:.05em;line-height:1.6;
+  transition:.2s;
+  animation:rise .35s both;
+}
+.choice:nth-child(1){animation-delay:.02s}
+.choice:nth-child(2){animation-delay:.09s}
+.choice:nth-child(3){animation-delay:.16s}
+.choice:nth-child(4){animation-delay:.23s}
+.choice:nth-child(5){animation-delay:.30s}
+@keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.choice::before{
+  content:"◦";position:absolute;left:16px;top:12px;color:var(--gold);opacity:.6;font-size:17px;
+}
+.choice:hover{
+  background:linear-gradient(90deg,rgba(200,164,92,.22),rgba(200,164,92,.05));
+  border-color:rgba(200,164,92,.6);transform:translateX(4px);
+  box-shadow:-3px 0 0 0 var(--gold),0 8px 26px rgba(0,0,0,.4);
+}
+.choice:hover::before{content:"▸";opacity:1}
+.choice .use{display:block;font-size:11.5px;letter-spacing:.14em;color:var(--jade);opacity:.85;margin-top:5px}
+.choice.locked{
+  cursor:not-allowed;opacity:.42;border-style:dashed;background:rgba(232,220,194,.03);
+  filter:grayscale(.5);
+}
+.choice.locked::before{content:"×";color:rgba(232,220,194,.5)}
+.choice.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.choice.locked .use{color:rgba(200,164,92,.75)}
+.choice.danger:hover{background:linear-gradient(90deg,rgba(200,84,63,.24),rgba(200,84,63,.05));border-color:rgba(200,84,63,.6);box-shadow:-3px 0 0 0 var(--blood),0 8px 26px rgba(0,0,0,.4)}
+.foot{display:flex;justify-content:space-between;align-items:center;padding:0 6px 4px;font-size:11.5px;letter-spacing:.14em;color:rgba(232,220,194,.34)}
+.foot button{font-size:11.5px;padding:4px 9px}
+
+/* 结局 */
+.ending{text-align:center;padding:8px 0 2px;animation:rise .6s both}
+.ending .tag{font-size:12px;letter-spacing:.5em;color:var(--jade);opacity:.8}
+.ending h2{margin:12px 0 6px;font-size:26px;letter-spacing:.34em;color:var(--gold);font-weight:400;text-shadow:0 0 30px rgba(200,164,92,.4)}
+.ending .sub{font-size:12.5px;letter-spacing:.2em;color:rgba(232,220,194,.5);margin-bottom:18px}
+.ending .recap{border-top:1px dashed rgba(200,164,92,.2);border-bottom:1px dashed rgba(200,164,92,.2);padding:13px 0;margin:0 auto 18px;max-width:430px;font-size:13.5px;line-height:2;color:rgba(232,220,194,.75);letter-spacing:.05em}
+.ending .recap b{color:var(--gold);font-weight:400}
+
+/* 弹窗 */
+.modal{
+  position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
+  background:rgba(4,5,9,.82);backdrop-filter:blur(3px);padding:20px;
+}
+.modal[hidden]{display:none}
+.card{
+  width:100%;max-width:470px;max-height:86vh;overflow:auto;
+  border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px;
+  background:linear-gradient(180deg,#12151d,#0b0d13);box-shadow:0 30px 90px rgba(0,0,0,.7);
+  animation:rise .3s both;
+}
+.card h3{margin:0 0 4px;font-weight:400;font-size:19px;letter-spacing:.3em;color:var(--gold)}
+.card .tip{font-size:11.5px;color:rgba(232,220,194,.45);letter-spacing:.1em;margin-bottom:14px}
+.card p,.card li{font-size:14px;line-height:1.95;color:#ddd1b7;letter-spacing:.03em}
+.card ul{padding-left:1.2em;margin:.4em 0}
+.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.row .ghost{flex:1 1 auto;text-align:center;padding:9px 12px}
+.slots{display:flex;flex-direction:column;gap:9px}
+.slot{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;
+  border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;
+  background:linear-gradient(90deg,rgba(200,164,92,.08),rgba(200,164,92,.02));
+  font-family:inherit;color:var(--paper);transition:.18s;
+}
+.slot:hover{border-color:rgba(200,164,92,.6);background:linear-gradient(90deg,rgba(200,164,92,.2),rgba(200,164,92,.04))}
+.slot b{font-weight:400;font-size:14.5px;letter-spacing:.16em;color:var(--gold)}
+.slot span{font-size:11.5px;color:rgba(232,220,194,.5);letter-spacing:.08em}
+.stat-list{font-size:13.5px;line-height:2.05;color:rgba(232,220,194,.8)}
+.deadline{font-size:12px;color:var(--blood);letter-spacing:.12em;margin-top:10px}
+
+/* 提示 */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:30;display:flex;flex-direction:column;gap:7px;align-items:center;pointer-events:none}
+.tst{
+  font-size:13px;letter-spacing:.12em;padding:8px 16px;border-radius:999px;
+  border:1px solid rgba(200,164,92,.4);background:rgba(12,14,20,.94);color:var(--gold);
+  box-shadow:0 10px 30px rgba(0,0,0,.6);animation:tin .3s both;
+}
+.tst.bad{border-color:rgba(200,84,63,.5);color:#e88a72}
+.tst.ok{border-color:rgba(127,208,194,.45);color:var(--jade)}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media (max-width:600px){
+  body{padding:10px 8px 20px}
+  .brand{font-size:16px;letter-spacing:.3em}
+  .scroll{padding:16px 15px 18px;border-radius:15px}
+  #text{font-size:15.5px;line-height:1.95}
+  .choice{font-size:14.5px;padding:12px 13px 12px 34px}
+  .meter{min-width:104px}
+  .hud{gap:10px 16px;padding:10px 12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="brand">灯 下<small>一个没有名字的村子</small></div>
+    <div class="topbtns">
+      <button class="ghost" id="btnSave">存档</button>
+      <button class="ghost" id="btnLoad">读档</button>
+      <button class="ghost" id="btnStatus">状态</button>
+      <button class="ghost" id="btnAbout">说明</button>
+    </div>
+  </header>
+
+  <section class="hud">
+    <div class="meter" id="hpHud"><div class="lab"><span>命 灯</span><b id="hpNum">10/10</b></div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="meter" id="spHud"><div class="lab"><span>心 魂</span><b id="spNum">7/10</b></div><div class="bar"><i style="width:70%"></i></div></div>
+    <div class="meter stat"><div class="lab"><span>察</span><b id="insNum">0</b></div></div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <main class="scroll">
+    <div class="sceneTitle" id="sceneTitle">序 · 夜行</div>
+    <div id="text"></div>
+    <div class="hint" id="skipHint" hidden>点击正文可跳过逐字</div>
+  </main>
+
+  <nav id="choices"></nav>
+  <div class="foot">
+    <span id="footLeft">第一盏灯还未点起</span>
+    <span><button class="ghost" id="btnRestart">从头开始</button></span>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="card" id="modalCard"></div>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ==========================================================
+   灯下 · 我的第一个文字游戏
+   单文件文字互动游戏 —— 无依赖、纯前端、离线可玩
+   ========================================================== */
+
+var HP_MAX = 10, SP_MAX = 10;
+
+var ITEMS = {
+  bijian:  {n:"碧简灯",   d:"铜绿斑驳的小灯，灯芯冷得像一节骨头。传说点三次，能照见前世的自己。"},
+  tongjing:{n:"青铜小镜", d:"镜面照不清脸，却照得见一栋不存在的屋。照久了，屋里的人会转过头来。"},
+  zhen:    {n:"乌木针",   d:"阿箬替你从背上挑出的三根针。针尖发青，还在轻轻震。"},
+  banpage: {n:"半页黄纸", d:"村志被撕去的那半页。上面写着你的名字——以及“献”字。"},
+  yao:     {n:"当归远志", d:"两味药。嚼下去舌根发麻，能让胸口的火稳一点。"},
+  tuo:     {n:"木陀螺（影）", d:"阿箬给你的陀螺影子。很轻，像一个空壳。转起来的时候，灰里会浮出三十年前的那个晚上。"}
+};
+
+/* ---------------- 状态 ---------------- */
+var freshState = function(){
+  return {
+    node:"prologue",
+    hp:HP_MAX, sp:SP_MAX, ins:0,
+    items:{ bijian:true },
+    flags:{},
+    log:[],
+    steps:0,
+    endings:{}
+  };
+};
+var P = freshState();
+
+var KEY_SAVE = "dengxia_save_v1";
+var KEY_END  = "dengxia_endings_v1";
+
+try{
+  var em = localStorage.getItem(KEY_END);
+  if(em){ var tmp = JSON.parse(em); if(tmp && typeof tmp === "object") P.endings = tmp; }
+}catch(e){}
+
+/* ---------------- DOM ---------------- */
+var $ = function(id){ return document.getElementById(id); };
+var elTitle = $("sceneTitle"), elText = $("text"), elChoices = $("choices");
+var elHp = $("hpHud"), elSp = $("spHud"), elChips = $("chips");
+var elHpNum = $("hpNum"), elSpNum = $("spNum"), elInsNum = $("insNum");
+var elModal = $("modal"), elModalCard = $("modalCard");
+var elFoot = $("footLeft"), elSkip = $("skipHint");
+
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+/* ---------------- 提示 ---------------- */
+function toast(msg, kind){
+  var d = document.createElement("div");
+  d.className = "tst" + (kind? " "+kind : "");
+  d.textContent = msg;
+  $("toast").appendChild(d);
+  setTimeout(function(){
+    d.style.transition="opacity .5s"; d.style.opacity="0";
+    setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 520);
+  }, 1900);
+}
+
+/* ---------------- 状态栏 ---------------- */
+function renderHud(){
+  elHpNum.textContent = P.hp + "/" + HP_MAX;
+  elSpNum.textContent = P.sp + "/" + SP_MAX;
+  elInsNum.textContent = P.ins;
+  elHp.querySelector("i").style.width = (clamp(P.hp,0,HP_MAX)/HP_MAX*100)+"%";
+  elSp.querySelector("i").style.width = (clamp(P.sp,0,SP_MAX)/SP_MAX*100)+"%";
+  var keys = Object.keys(P.items).filter(function(k){ return P.items[k] && ITEMS[k]; });
+  if(!keys.length){ elChips.innerHTML = '<span class="chip empty">身上空空如也</span>'; return; }
+  elChips.innerHTML = keys.map(function(k){
+    return '<span class="chip" title="'+esc(ITEMS[k].d)+'">'+esc(ITEMS[k].n)+'</span>';
+  }).join("");
+}
+function esc(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ---------------- 效果 ---------------- */
+function has(item){ return !!P.items[item]; }
+function give(item){
+  if(P.items[item]) return;
+  P.items[item] = true;
+  toast("得到：" + (ITEMS[item]? ITEMS[item].n : item));
+  renderHud();
+}
+function take(item){
+  if(!P.items[item]) return;
+  delete P.items[item];
+  toast("失去：" + (ITEMS[item]? ITEMS[item].n : item), "bad");
+  renderHud();
+}
+function applyEffects(e){
+  e = e || {};
+  if(e.hp){
+    P.hp = clamp(P.hp + e.hp, 0, HP_MAX);
+    toast((e.hp>0?"命灯 +":"命灯 ") + e.hp, e.hp>0? "ok":"bad");
+  }
+  if(e.sp){
+    P.sp = clamp(P.sp + e.sp, 0, SP_MAX);
+    toast((e.sp>0?"心魂 +":"心魂 ") + e.sp, e.sp>0? "ok":"bad");
+  }
+  if(e.ins){ P.ins += e.ins; toast("察觉 +" + e.ins, "ok"); }
+  if(e.give){ (typeof e.give==="string"? [e.give] : e.give).forEach(give); }
+  if(e.take){ (typeof e.take==="string"? [e.take] : e.take).forEach(take); }
+  if(e.flag){ Object.keys(e.flag).forEach(function(k){ P.flags[k] = e.flag[k]; }); }
+  if(e.log){ P.log.push(e.log); }
+  renderHud();
+}
+
+/* ---------------- 打字机 ---------------- */
+var typing = false, fullText = "", timer = null;
+function typeOut(html, done){
+  elText.innerHTML = "";
+  typing = true;
+  elSkip.hidden = false;
+  var i = 0, chunk = 2;
+  var caret = '<span class="caret">▌</span>';
+  function step(){
+    if(i >= html.length){ finish(); return; }
+    i += chunk;
+    elText.innerHTML = html.slice(0,i) + caret;
+    scrollBottom();
+    timer = setTimeout(step, 16);
+  }
+  function finish(){
+    clearTimeout(timer);
+    typing = false;
+    elSkip.hidden = true;
+    elText.innerHTML = html;
+    scrollBottom();
+    if(done) done();
+  }
+  timer = setTimeout(step, 40);
+  elText.onclick = function(){ if(typing) finish(); };
+  return finish;
+}
+function scrollBottom(){
+  try{ window.scrollTo({ top: document.body.scrollHeight, behavior:"smooth" }); }
+  catch(e){
+    try{ if(typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, document.body.scrollHeight); }catch(e2){}
+  }
+}
+function stopTyping(){
+  if(timer) clearTimeout(timer);
+  typing = false;
+  elSkip.hidden = true;
+}
+elText.addEventListener("click", function(){ if(typing) stopTyping(); });
+
+/* ---------------- 文本渲染 ---------------- */
+function renderBody(body){
+  var html;
+  if(typeof body === "function") html = body();
+  else html = String(body||"");
+  html = esc(html);
+  // 标记语法
+  html = html.replace(/^\s*>>\s?(.*)$/gm, '<p class="sys">$1</p>');
+  html = html.replace(/^\s*!!\s?(.*)$/gm, '<p class="gain">$1</p>');
+  html = html.replace(/「([^」]*)」/g, '<span style="color:#f5ebd3">「$1」</span>');
+  html = html.replace(/^\s*#\s?(.*)$/gm, '<p style="color:rgba(232,220,194,.42);font-size:13.5px;letter-spacing:.16em;text-align:center">· $1 ·</p>');
+  html = html.replace(/\n{2,}/g, "\n");
+  html = html.replace(/\n/g, "<br>");
+  html = html.replace(/<br>(<p class="(?:sys|gain)")/g, "$1");
+  html = html.replace(/(<\/p>)<br>/g, "$1");
+  return html;
+}
+
+/* ---------------- 场景 ---------------- */
+function goto(id){
+  var node = SCENES[id];
+  if(!node){ console.error("missing node", id); toast("此处尚未写成：" + id, "bad"); return; }
+  P.node = id;
+  P.steps++;
+  renderHud();
+  if(node.enter) node.enter();
+
+  // 死亡 / 结局分支优先
+  // 结局优先：若目标本身是结局节点，就不再改写为灯灭 / 失魂
+  if(!node.ending){
+    if(P.hp <= 0){ return goto("end_lamp_out"); }
+    if(P.sp <= 0){ return goto("end_mad"); }
+  }
+
+  elTitle.textContent = (node.title || "灯下").replace(/\{name\}/g, nameOf());
+  var html = renderBody(node.text);
+  stopTyping();
+  elChoices.innerHTML = "";
+  elFoot.textContent = footText();
+  typeOut(html, function(){ renderChoices(node); });
+  return node;
+}
+function nameOf(){
+  if(P.flags.truename) return P.flags.truename;
+  if(P.flags.fakename) return P.flags.fakename;
+  return "无名";
+}
+function footText(){
+  var bits = [];
+  bits.push("第 " + P.steps + " 步");
+  if(P.flags.revealed) bits.push("已吐真言 " + P.flags.revealed + " 次");
+  if(P.flags.concealed) bits.push("缄口 " + P.flags.concealed + " 次");
+  if(Object.keys(P.endings).length) bits.push("已见结局 " + Object.keys(P.endings).length + "/6");
+  return bits.join("　·　");
+}
+
+function choiceOk(c){
+  if(!c.req) return true;
+  if(c.req.item && !has(c.req.item)) return false;
+  if(c.req.notItem && has(c.req.notItem)) return false;
+  if(c.req.ins && P.ins < c.req.ins) return false;
+  if(c.req.flag && !P.flags[c.req.flag]) return false;
+  if(c.req.notFlag && P.flags[c.req.notFlag]) return false;
+  return true;
+}
+function reqText(c){
+  if(!c.req) return "条件不足";
+  var need = [];
+  if(c.req.item){
+    need.push("你还没有「" + (ITEMS[c.req.item] ? ITEMS[c.req.item].n : c.req.item) + "」");
+  }
+  if(c.req.notItem) need.push("若已失「" + (ITEMS[c.req.notItem] ? ITEMS[c.req.notItem].n : c.req.notItem) + "」，则无从问起");
+  if(c.req.ins) need.push("需要察觉 ≥ " + c.req.ins);
+  if(c.req.flag) need.push(c.req.flagText || "时机未到");
+  if(c.req.notFlag) need.push(c.req.notFlagText || "此路已断");
+  return need.join("；") || "条件不足";
+}
+
+function renderChoices(node){
+  elChoices.innerHTML = "";
+  var list = (typeof node.choices === "function") ? node.choices() : (node.choices || []);
+  if(!list.length){
+    var b = document.createElement("button");
+    b.className = "choice";
+    b.textContent = "（继续）";
+    b.onclick = function(){ goto("prologue"); };
+    elChoices.appendChild(b);
+    return;
+  }
+  list.forEach(function(c){
+    if(c.hide) return;
+    var ok = choiceOk(c);
+    var btn = document.createElement("button");
+    btn.className = "choice" + (ok? "" : " locked") + (c.danger? " danger" : "");
+    if(ok){
+      btn.innerHTML = esc(c.text) + (c.use ? '<span class="use">（'+esc(c.use)+'）</span>' : "");
+    } else {
+      btn.innerHTML = esc(c.text) + '<span class="use">（'+esc(reqText(c))+'）</span>';
+    }
+    if(ok){
+      btn.onclick = function(){
+        P.log.push(c.text);
+        if(c.act) c.act();
+        if(c.to) goto(typeof c.to === "function"? c.to() : c.to);
+        else renderChoices(SCENES[P.node]);
+      };
+    } else {
+      btn.onclick = function(){ toast("条件不足。", "bad"); };
+    }
+    elChoices.appendChild(btn);
+  });
+}
+
+/* ---------------- 存档 ---------------- */
+function saveGame(slot){
+  try{
+    var data = { t: Date.now(), node:P.node, hp:P.hp, sp:P.sp, ins:P.ins, items:P.items, flags:P.flags, log:P.log.slice(-30), steps:P.steps };
+    localStorage.setItem(KEY_SAVE + "_" + slot, JSON.stringify(data));
+    return true;
+  }catch(e){ return false; }
+}
+function readSlot(slot){
+  try{
+    var raw = localStorage.getItem(KEY_SAVE + "_" + slot);
+    return raw? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function loadSlot(slot){
+  var d = readSlot(slot);
+  if(!d){ toast("这个存档是空的。", "bad"); return false; }
+  var ends = P.endings;
+  P = freshState();
+  P.endings = ends;
+  P.node = d.node; P.hp = d.hp; P.sp = d.sp; P.ins = d.ins||0;
+  P.items = d.items || {}; P.flags = d.flags || {}; P.log = d.log || []; P.steps = d.steps||0;
+  closeModal();
+  toast("已回到：" + (SCENES[P.node]? (SCENES[P.node].title||"灯下") : "未知处"), "ok");
+  goto(P.node);
+  return true;
+}
+function slotInfo(slot){
+  var d = readSlot(slot);
+  if(!d) return "空";
+  var s = SCENES[d.node]? (SCENES[d.node].title||"") : "";
+  var dt = new Date(d.t);
+  var pad = function(n){ return n<10? "0"+n : ""+n; };
+  return s + "　" + dt.getMonth()+1 + "/" + dt.getDate() + " " + pad(dt.getHours()) + ":" + pad(dt.getMinutes());
+}
+
+/* ---------------- 弹窗 ---------------- */
+function openModal(html){ elModalCard.innerHTML = html; elModal.hidden = false; }
+function closeModal(){ elModal.hidden = true; }
+elModal.addEventListener("click", function(e){
+  if(e.target === elModal) closeModal();
+  var act = e.target.getAttribute && e.target.getAttribute("data-act");
+  if(!act) return;
+  if(act === "close") closeModal();
+  if(act === "save"){ var s1=e.target.getAttribute("data-slot"); if(saveGame(s1)){ toast("已存于第 "+s1+" 格","ok"); showSave(); } }
+  if(act === "load"){ loadSlot(e.target.getAttribute("data-slot")); }
+  if(act === "wipe"){ if(confirm("清空全部存档与结局记录？")){ [1,2,3].forEach(function(i){ localStorage.removeItem(KEY_SAVE+"_"+i); }); localStorage.removeItem(KEY_END); toast("已清空"); closeModal(); } }
+});
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeModal(); });
+
+function showSave(){
+  var h = '<h3>存 档</h3><div class="tip">记录停留在当前场景。共三格，可随时覆盖。</div><div class="slots">';
+  [1,2,3].forEach(function(i){
+    h += '<button class="slot" data-act="save" data-slot="'+i+'"><b>第 '+i+' 格</b><span>'+esc(slotInfo(i))+'</span></button>';
+  });
+  h += '</div><div class="row"><button class="ghost" data-act="close">返回</button></div>';
+  openModal(h);
+}
+function showLoad(){
+  var h = '<h3>读 档</h3><div class="tip">回到过去的某一盏灯下。</div><div class="slots">';
+  [1,2,3].forEach(function(i){
+    h += '<button class="slot" data-act="load" data-slot="'+i+'"><b>第 '+i+' 格</b><span>'+esc(slotInfo(i))+'</span></button>';
+  });
+  h += '</div><div class="row"><button class="ghost" data-act="close">返回</button><button class="ghost" data-act="wipe">清空存档</button></div>';
+  openModal(h);
+}
+function showStatus(){
+  var items = Object.keys(P.items).filter(function(k){ return P.items[k] && ITEMS[k]; });
+  var h = '<h3>状 态</h3><div class="tip">'+esc(nameOf())+'　·　第 '+P.steps+' 步</div>';
+  h += '<div class="stat-list">命灯：'+P.hp+' / '+HP_MAX+'<br>心魂：'+P.sp+' / '+SP_MAX+'<br>察觉：'+P.ins+'</div>';
+  h += '<div class="tip" style="margin:14px 0 6px">随身之物</div>';
+  if(items.length){
+    h += '<div class="stat-list">' + items.map(function(k){
+      return '· <span style="color:#e8dcc2">'+esc(ITEMS[k].n)+'</span><br><span style="color:rgba(232,220,194,.5);font-size:12.5px">'+esc(ITEMS[k].d)+'</span>';
+    }).join("<br>") + '</div>';
+  } else { h += '<div class="stat-list" style="color:rgba(232,220,194,.4)">空空如也。</div>'; }
+  h += '<div class="tip" style="margin:16px 0 6px">已见结局</div><div class="stat-list">';
+  var all = ["end_lamp_out","end_mad","end_keep","end_return","end_free","end_walk"];
+  var names = { end_lamp_out:"灯灭", end_mad:"失魂", end_keep:"留名", end_return:"无名", end_free:"出村", end_walk:"雾中" };
+  h += all.map(function(k){ return (P.endings[k]? '· <span style="color:#c8a45c">'+names[k]+'</span>' : '· <span style="color:rgba(232,220,194,.25)">？？</span>'); }).join("<br>");
+  h += '</div>';
+  if(P.log.length){
+    h += '<div class="tip" style="margin:16px 0 6px">近来的选择</div><div class="stat-list" style="font-size:12.5px;color:rgba(232,220,194,.55)">'
+       + P.log.slice(-6).map(function(t){ return "· "+esc(t); }).join("<br>") + '</div>';
+  }
+  h += '<div class="row"><button class="ghost" data-act="close">返回</button></div>';
+  openModal(h);
+}
+function showAbout(){
+  var h = '<h3>说 明</h3><div class="tip">灯下 · 一个没有名字的村子</div>'
+    + '<p>你在一座破庙里醒来，记得自己的名字，却想不起自己是谁。走三里路，是一个村子——村里没有一个活人，只有满墙的红灯笼。</p>'
+    + '<ul>'
+    + '<li><b>命灯</b>：你的阳寿。归零即死。</li>'
+    + '<li><b>心魂</b>：你的心神。归零即疯。</li>'
+    + '<li><b>察觉</b>：你看见了多少不该看见的东西。它决定你能不能问出真话、看见暗门、拿到最好的结局。</li>'
+    + '<li>「说出真话」会让命灯与心魂变化；有时是救命，有时是索命。</li>'
+    + '<li>道具会解锁新的选项；灰色选项表示条件不足。</li>'
+    + '<li>共 <b>6 种结局</b>。存档保存在本机浏览器里。</li>'
+    + '<li>正文里出现的图片可以直接<b>点击</b>——那不是插画，是选项。</li>'
+    + '</ul>'
+    + '<p style="color:rgba(232,220,194,.5);font-size:12.5px">提示：点击正文可跳过逐字显示。察觉 ≥ 6、并集齐关键之物的人，会走进一条不太一样的路。</p>'
+    + '<div class="row"><button class="ghost" data-act="close">开始</button></div>';
+  openModal(h);
+}
+
+$("btnSave").onclick = showSave;
+$("btnLoad").onclick = showLoad;
+$("btnStatus").onclick = showStatus;
+$("btnAbout").onclick = showAbout;
+$("btnRestart").onclick = function(){
+  if(!confirm("从头开始？当前进度不会保存（除非你已存档）。")) return;
+  var ends = P.endings;
+  P = freshState(); P.endings = ends;
+  goto("prologue");
+};
+
+/* ==========================================================
+   剧 情
+   ========================================================== */
+var SCENES = {};
+
+/* ---------- 序章 ---------- */
+SCENES.prologue = {
+  title:"序 · 夜行",
+  text:
+"你是被冷醒的。\n\n"+
+"破庙的屋梁上挂着半截蛛网，网里裹着一只死去的飞蛾。香案倒了，泥塑的神像少了半张脸——剩下的那半张在笑。\n\n"+
+"你坐起来，先摸自己的胸口：心跳还在，胸口却挂着一盏巴掌大的铜灯，铜绿斑驳，灯芯冷得像一节骨头。\n\n"+
+"你记得自己的名字。\n"+
+"你也记得三件事：你要去一个村子；你要点三次灯；还有——\n\n"+
+"!!你不能把灯交给任何一个人。\n\n"+
+"庙门外，雨停了。三里之外有灯火，红得像有人把整面墙浸进了血里。",
+  choices:[
+    { text:"吹一吹灯芯，试着点着它", to:"s1_light" },
+    { text:"先检查神像碎片底下压着什么", req:{ins:0}, to:"s1_statue" },
+    { text:"直接推门出去，往那点灯火走", to:"s1_out" }
+  ]
+};
+
+SCENES.s1_statue = {
+  title:"一 · 泥神",
+  text:
+"你挪开半张脸的碎片。下面压着一枚铜钱，钱眼里穿了一根红线，红线上打着三个死结。\n\n"+
+"泥像剩下半张脸，嘴角是朝上的。你盯着看了一会儿，忽然觉得——它不是笑，是咬着牙。\n\n"+
+">> 察觉 +1　你把这枚铜钱揣进怀里，红线硌着手心，很凉。",
+  enter:function(){ applyEffects({ins:1, flag:{coin:true}}); },
+  choices:[
+    { text:"点灯", to:"s1_light" },
+    { text:"出门", to:"s1_out" }
+  ]
+};
+
+SCENES.s1_light = {
+  title:"一 · 第一盏",
+  text:
+"你捏着灯芯，试着吹了一口气。\n\n"+
+"没有火。灯芯自己亮了。\n\n"+
+"火苗是青色的，很小，照不亮庙里的一根柱子，却把你的影子拉到了墙上——那道影子比你高了整整一头，而且，它没有跟着你抬手。\n\n"+
+">> 命灯记下：第一盏，已点。\n"+
+"屋子里明明没有风，你却听见有人在很远的地方，用很轻的声音数了个“一”。",
+  enter:function(){ applyEffects({flag:{lit1:true}}); },
+  choices:[
+    { text:"把灯收进怀里，出门", to:"s1_out" },
+    { text:"对着影子问：“你是谁？”", req:{ins:1}, to:"s1_shadow", use:"察觉 ≥ 1" }
+  ]
+};
+
+SCENES.s1_shadow = {
+  title:"一 · 你的影子",
+  text:
+"「你是谁？」\n\n"+
+"墙上的影子慢慢转过头来。它的嘴没有动，地上却浮起一行湿漉漉的字：\n\n"+
+"「我是你剩下的一半。你丢的那一半，在村里等了你三十年。」\n\n"+
+"你退了一步。影子顺从地跟着你退——终于变得和你一样高了。\n\n"+
+">> 察觉 +1　你记住了「三十年」这三个字。",
+  enter:function(){ applyEffects({ins:1, flag:{half:true}}); },
+  choices:[ { text:"出门", to:"s1_out" } ]
+};
+
+SCENES.s1_out = {
+  title:"一 · 三里路",
+  text:
+"夜里的土路被雨泡软了，踩下去吱一声。两侧的田里没有庄稼，只有齐膝高的白草，风一过，全朝着村子的方向倒。\n\n"+
+"你走了半个时辰，抬头一看——那点灯火还在原处，尺寸分毫未变。\n\n"+
+"三里路走不到的地方，就不叫三里路了。\n\n"+
+"路旁蹲着一只黑猫，两只眼睛一蓝一黄。它盯着你怀里的灯，忽然站起来，往村子的方向走三步，回头看你一眼。\n\n"+
+"像在带路。",
+  enter:function(){ applyEffects({flag:{cat:true}}); },
+  choices:[
+    { text:"跟着黑猫走", to:"s1_cat" },
+    { text:"不理它，自己往前走", to:"s1_inn" }
+  ]
+};
+
+SCENES.s1_cat = {
+  title:"一 · 带路的猫",
+  text:
+"黑猫走得极慢，每走七步就停下，用尾巴扫一下地面。第七次停下时，你发现它扫过的地方埋着一样东西。\n\n"+
+"你蹲下去挖了半尺，挖出一只虎头鞋，鞋底绣着一个小小的“箬”字。\n\n"+
+"猫钻进了草里，再没出来。\n\n"+
+">> 察觉 +1　你把那只小鞋收好。你好像记起了什么，又好像什么都没记起。",
+  enter:function(){ applyEffects({ins:1, flag:{shoe:true}}); },
+  choices:[ { text:"继续往村里走", to:"s1_inn" } ]
+};
+
+SCENES.s1_inn = {
+  title:"一 · 有间客栈",
+  text:
+"村口第一家是客栈，门楣上挂着两盏红灯笼。灯笼里没有蜡烛，光却红得发稠，一缕一缕往下滴。\n\n"+
+"门是开着的。柜台后坐着一个人，穿着洗得发白的掌柜袍，正低着头用抹布擦一只空碗。擦了七八遍，碗早就干了。\n\n"+
+"他抬起头。他的眼睛很干净，干净得不像是活人的眼睛。\n\n"+
+"「客官，」他说，「住店，还是问路？」\n\n"+
+"他的目光在你胸口停了一瞬，落在那盏灯上。",
+  choices:[
+    { text:"「住店。」", to:"s1_stay" },
+    { text:"「问路。我想知道这个村子叫什么。」", to:"s1_ask" },
+    { text:"「你认不认识一个叫阿箬的孩子？」", req:{flag:"shoe"}, use:"虎头鞋", to:"s1_ask2" }
+  ]
+};
+
+SCENES.s1_stay = {
+  title:"一 · 上房",
+  text:
+"「上房一间，」他站起来，声音很轻，「三十文。」\n\n"+
+"你把铜钱放在柜台上。他没有收，只是看着那三个死结的红线，很久。\n\n"+
+"「客官这钱，」他慢慢说，「是从庙里捡的罢。」\n\n"+
+"你没答话。他忽然叹了口气，把柜台下面的灯拨亮了一点。\n\n"+
+"「上楼吧。第三间。夜里听见有人叫你名字，不管叫几遍——别答应。」\n\n"+
+">> 心魂 +1",
+  enter:function(){ applyEffects({sp:1, flag:{warned:true}}); },
+  choices:[
+    { text:"上楼，睡下", to:"s1_night" },
+    { text:"不睡，留在柜台边看他", req:{ins:2}, to:"s1_watch", use:"察觉 ≥ 2" }
+  ]
+};
+
+SCENES.s1_ask = {
+  title:"一 · 村名",
+  text:
+"「村名？」他笑了，笑得很浅，「客官，这个村子没有名字。」\n\n"+
+"「为什么？」\n\n"+
+"「有了名字，就有人找得到。有人找得到，就有人带得走。」他又低头去擦那只碗，「三十年了，一共来过四个人。前三个都上楼睡了。」\n\n"+
+"「第四个呢？」\n\n"+
+"「第四个，」他抬起眼，「站在你现在站的地方，问我村里的孩子叫什么。」\n\n"+
+">> 察觉 +1",
+  enter:function(){ applyEffects({ins:1, flag:{four:true}}); },
+  choices:[
+    { text:"「那个孩子叫什么？」", to:"s1_ask2" },
+    { text:"「我要住店。」", to:"s1_stay" }
+  ]
+};
+
+SCENES.s1_ask2 = {
+  title:"一 · 阿箬",
+  text:
+"掌柜的手停了。抹布掉在柜台上，发出一声很轻的响。\n\n"+
+"「你从哪儿听见这个名字的？」\n\n"+
+"「庙里。」你说。\n\n"+
+"他沉默了很久，久到门外那两盏灯笼的红光都不再往下滴了。\n\n"+
+"「那孩子在井底，」他终于说，「已经三十年了。你要是真想见她——西头有口井，井边有一盏灯，灯是黑的。别用手去摸那盏灯。」\n\n"+
+"「还有，」他叫住正要出门的你，「你要是记起了自己的名字，千万别在村里说出来。说出来，你就走不了了。」",
+  enter:function(){ applyEffects({ins:1, flag:{wellHint:true, warned:true}, sp:1}); },
+  choices:[
+    { text:"道谢，出门往西去", to:"s1_west" },
+    { text:"「你为什么知道得这么清楚？」", req:{ins:3}, to:"s1_ask3", use:"察觉 ≥ 3" }
+  ]
+};
+
+SCENES.s1_ask3 = {
+  title:"一 · 掌柜的碗",
+  text:
+"「你为什么知道得这么清楚？」\n\n"+
+"他把那只碗翻过来。碗底用刀刻着两个字，笔画很深，像是刻了很多次。\n\n"+
+"是你自己的名字。\n\n"+
+"你浑身一凉，抬头要问，柜台上已经空了。抹布还搭在原处，椅子上一个人也没有。只有门外两盏灯笼，红得像是有人刚在里面点了什么。\n\n"+
+">> 察觉 +1　你记下了：这村里的人，都在演一场三十年前的戏。\n"+
+"!!你怀里的灯，烫了一下。",
+  enter:function(){ applyEffects({ins:1, flag:{bowl:true}, hp:-1}); },
+  choices:[ { text:"往西，去看那口井", to:"s1_west" } ]
+};
+
+SCENES.s1_watch = {
+  title:"一 · 柜台后",
+  text:
+"你假装出门，却躲在门后的暗处。\n\n"+
+"掌柜的从柜台下面抱出一叠纸，一张一张数着，数到第三十张停住，把最上面那张抽出来，放在灯笼底下照。\n\n"+
+"纸上画着一个很小的孩子，扎两个髻，手里攥着一只虎头鞋。\n\n"+
+"他看了很久，然后把纸折起来，塞进了自己嘴里，很慢地、很用力地嚼。\n\n"+
+"嚼完，他对着空屋子说了一句：「今年，也留不住。」\n\n"+
+">> 察觉 +1　心魂 −1　你退出去的时候，脚边的影子替你掩上了门。",
+  enter:function(){ applyEffects({ins:1, sp:-1, flag:{chewed:true}}); },
+  choices:[ { text:"离开客栈，往西去", to:"s1_west" } ]
+};
+
+/* ---------- 第一章 · 村夜 ---------- */
+SCENES.s1_night = {
+  title:"一 · 第三间房",
+  text:
+"第三间房的床板很硬，被子上有股雨味。你躺下，把灯放在枕边，青色的火苗照着一小块天花板。\n\n"+
+"半夜，楼下有人叫你。\n\n"+
+"「……阿箬。」\n\n"+
+"不是叫你。那个声音又轻又软，一遍一遍地念着一个孩子的名字，像在哄睡。念到第七遍，声音忽然贴到了你的耳后：\n\n"+
+"「你为什么不答应？」",
+  choices:[
+    { text:"咬住舌头，一声不出", to:"s1_west" },
+    { text:"翻身坐起，掀开被子看床下", req:{ins:2}, to:"s1_bed", use:"察觉 ≥ 2" }
+  ]
+};
+
+SCENES.s1_bed = {
+  title:"一 · 床下",
+  text:
+"床下蹲着一个孩子，抱着一只虎头鞋，仰着脸看你。\n\n"+
+"她的眼睛是空的。不是黑，是空——像是有人把眼珠取走了，留下两个正好透光的窟窿。\n\n"+
+"「你终于来了。」她说，「我等了三十年，脚都凉了。」\n\n"+
+"你伸手想去拉她，指尖穿过她的肩膀，摸到了一片水。\n\n"+
+"「别碰我，」她说，「你碰我，我就少一点。你到井边来。井边有我给你留的东西。」\n\n"+
+">> 察觉 +1　你确认了一件事：她认得你。",
+  enter:function(){ applyEffects({ins:1, flag:{metAruo:true}, sp:-1}); },
+  choices:[
+    { text:"天亮前出门，往西去", to:"s1_west" }
+  ]
+};
+
+SCENES.s1_west = {
+  title:"二 · 西头的井",
+  text:
+"村子西头有条石板路，石板缝里长满青苔，滑得能照见人影。路的尽头是一口井。\n\n"+
+"井边果然立着一盏灯——一人多高，青铜做的人形灯座，双手捧着一个空盘。灯是黑的，灯芯早就烧尽了，只在灯座上结了厚厚一层黑垢。\n\n"+
+"你走近，发现人形灯座的脸，是你自己的脸。\n\n"+
+">> 记住掌柜的话：别用手去摸那盏灯。",
+  choices:[
+    { text:"绕着灯走一圈，仔细看", req:{ins:1}, to:"s1_lamp_look", use:"察觉 ≥ 1" },
+    { text:"把手伸进灯盘里摸", danger:true, to:"s1_lamp_touch" },
+    { text:"对着井口喊：「阿箬。」", to:"s1_well_call" },
+    { text:"先不进井，去村里别处看看", to:"village" }
+  ]
+};
+
+SCENES.s1_lamp_look = {
+  title:"二 · 灯座上的字",
+  text:
+"你绕到灯座背后，黑垢底下藏着一圈字，是用指甲刻的，刻得很乱：\n\n"+
+"「第一个：姓陈，住两夜，说了名字，留下。」\n"+
+"「第二个：姓周，住一夜，没说话，还是留下。」\n"+
+"「第三个：忘了自己姓什么，天亮走了，三年后回来，自己走进井里。」\n"+
+"「第四个：——」\n\n"+
+"第四个后面被指甲刮花了。刮痕很深，深得像是刮的人不愿意让谁看见。\n\n"+
+">> 察觉 +1　心魂 +1　你意识到：前三个不是被留下来的，是被“留住”的。",
+  enter:function(){ applyEffects({ins:1, sp:1, flag:{lamptext:true}}); },
+  choices:[
+    { text:"对着井口喊「阿箬」", to:"s1_well_call" },
+    { text:"去村里别处看看", to:"village" }
+  ]
+};
+
+SCENES.s1_lamp_touch = {
+  title:"二 · 你摸了灯",
+  text:
+"你的手刚碰到灯盘，青铜就热了。\n\n"+
+"不是烫，是热得像一只刚握过别人的手。灯座的脸慢慢转过来，和你面对面，你听见自己的声音从灯里出来，很平静地说：\n\n"+
+"「你回来了。」\n\n"+
+"然后你发现，你的手抽不回来了。你的掌心开始变黑，黑气顺着血管往上爬，爬过手腕，爬过小臂。\n\n"+
+"你用力一扯——撕下了一层皮。\n\n"+
+"!!命灯 −2　你手掌上的黑没有完全褪掉，像胎记一样留了下来。",
+  enter:function(){ applyEffects({hp:-2, ins:1, flag:{blackhand:true}}); },
+  choices:[
+    { text:"退开三步，对着井口喊「阿箬」", to:"s1_well_call" },
+    { text:"先离开这里，去村里别处", to:"village" }
+  ]
+};
+
+SCENES.s1_well_call = {
+  title:"二 · 井底的回答",
+  text:
+"你喊了一声：「阿箬。」\n\n"+
+"井底没有回声。声音像是被什么吞掉了，连一丝都没剩下。\n\n"+
+"过了很久，井水才动了一下。不是波纹——是有一层水，慢慢浮了上来，浮到井口，停住，像一面竖起来的镜子。\n\n"+
+"水里映出的不是你。\n\n"+
+"是一个穿靛蓝布衫的孩子，站在井口边上，正低头往井里看。\n\n"+
+"你回头——井边没有人。",
+  choices:[
+    { text:"伸手去碰那层水", to:"s1_well_touch" },
+    { text:"往井里看，什么都不碰", req:{ins:2}, to:"s1_well_look", use:"察觉 ≥ 2" },
+    { text:"退开，去村里别处看看", to:"village" }
+  ]
+};
+
+SCENES.s1_well_look = {
+  title:"二 · 井中天",
+  text:
+"你不碰水，只看。\n\n"+
+"看久了，你发现那层水映的不是村子，是三十年前的一个白天。井边围了七八个人，有人抱着一个孩子，孩子手里攥着虎头鞋，一直在哭。\n\n"+
+"有个人蹲下来，在孩子耳边说了一句什么。孩子立刻不哭了。\n\n"+
+"然后他们把孩子放进了井里。没有人推，是她自己下去的。\n\n"+
+"水面重新合上的那一瞬，抱孩子的人抬起了头。\n\n"+
+"是掌柜的。年轻三十岁的掌柜的。\n\n"+
+">> 察觉 +2　心魂 −1　你听见自己在咬牙。",
+  enter:function(){ applyEffects({ins:2, sp:-1, flag:{sawRitual:true}}); },
+  choices:[
+    { text:"伸手去碰那层水", to:"s1_well_touch" },
+    { text:"退开，去村里别处看看", to:"village" }
+  ]
+};
+
+SCENES.s1_well_touch = {
+  title:"二 · 入 井",
+  text:
+"你的指尖碰到水面的那一刻，井口翻了过来。\n\n"+
+"不是水翻，是天翻。整个村子的灯火被倒扣过去，你脚下一空，直直坠了下去。\n\n"+
+"坠了很久，久到你有时间想明白一件事：这不是井，这是一张一直张着的嘴。\n\n"+
+"落地的声音很轻，像落在一层灰上。\n\n"+
+"四周极黑。你怀里的灯亮着，青色的火苗只照出三尺——脚下是一片灰白的地，铺满了碎瓷一样的骨头。\n\n"+
+"远处有水滴声。还有，很轻的、孩子哼歌的声音。",
+  enter:function(){ applyEffects({flag:{inWell:true}}); },
+  choices:[
+    { text:"跟着歌声走", to:"ch2_follow" },
+    { text:"就地挖一挖脚下的灰", req:{ins:2}, to:"ch2_dig", use:"察觉 ≥ 2" }
+  ]
+};
+
+/* ---------- 第一章 · 白日村中（分支探索） ---------- */
+SCENES.village = {
+  title:"二 · 白日的村子",
+  text:
+"天亮了。\n\n"+
+"这是最怪的地方——阳光很好，好得能看见空气里飘的浮尘，可村子里还是没有一个活人。\n\n"+
+"门都开着。灶上还有温的粥。晒衣绳上挂着洗到一半的衣服，水滴在地上，砸出一小片深色。\n\n"+
+"所有的门楣上，都挂着红灯笼。白天也亮着。\n\n"+
+"你可以去的地方不多：",
+  enter:function(){ if(!P.flags.vlg) applyEffects({flag:{vlg:true}}); },
+  choices:function(){
+    var list = [];
+    list.push({ text:"去西头的井（那里有你要找的人）", to:"s1_west" });
+    list.push({ text:"去义庄，看看死人", to:"v_yizhuang", hide:!!P.flags.did_yizhuang });
+    list.push({ text:"去祠堂，看看这个村子的牌位", to:"v_citang", hide:!!P.flags.did_citang });
+    list.push({ text:"去药铺，找找有没有能用的东西", to:"v_yaopu", hide:!!P.flags.did_yaopu });
+    list.push({ text:"回客栈，翻掌柜的柜台", to:"v_kezhan", hide:!!P.flags.did_kezhan });
+    list.push({ text:"（入夜了，去井边）", to:"s1_west",
+      req: (P.flags.village_done? null : {flag:"village_done", flagText:"村里还有地方没去过"}) });
+    return list;
+  }
+};
+
+SCENES.v_yizhuang = {
+  title:"二 · 义庄",
+  text:
+"义庄在村东，一间土房，门没锁。\n\n"+
+"里面停着三口薄棺，棺盖都没钉。你一一推开：\n\n"+
+"第一口，是个男人，穿掌柜袍，脸已经干了，像一张贴上去的纸。\n"+
+"第二口，是个女人，手里攥着一把梳子。\n"+
+"第三口，空的。棺底铺着新草，草上有个小小的凹痕——像是有人在这里躺过，躺了很久，刚走。\n\n"+
+"你把第三口棺材的草拨开，底下压着一根乌木针，针尖发青。",
+  enter:function(){ applyEffects({sp:1, flag:{did_yizhuang:true, village_done:true}, ins:1}); },
+  choices:[
+    { text:"拿起那根针", to:"v_yizhuang2" },
+    { text:"不碰棺材里的东西，出去", to:"village" }
+  ]
+};
+
+SCENES.v_yizhuang2 = {
+  title:"二 · 针",
+  text:
+"你把针拈起来。针很轻，却在手里轻轻地震，像是有什么东西在针里走。\n\n"+
+"你刚把它收进袖子，背后就传来一声很轻的、木头摩擦的声音。\n\n"+
+"三具棺材的盖子，全都自己合上了。\n\n"+
+"土房里的光暗下来。你听见有人在你背后说话，声音又干又扁：\n\n"+
+"「针是给活人用的。你身上有东西，扎出来就好了。」\n\n"+
+">> 察觉得到 +1",
+  enter:function(){ applyEffects({ins:1, flag:{voice:true}}); },
+  choices:[
+    { text:"把针扎进自己的手背", danger:true, to:"v_needle_self" },
+    { text:"把针收好，出去", to:"village" }
+  ]
+};
+
+SCENES.v_needle_self = {
+  title:"二 · 挑 出",
+  text:
+"针尖刺进手背，一点也不疼。\n\n"+
+"你往外一挑——挑出来的不是血。\n\n"+
+"是三条又细又白的丝，白的像线，还在动。它们在空气里扭了两下，化成三缕烟，散了。\n\n"+
+"你忽然听得清清楚楚：有人在很远的地方敲了三下钟。\n\n"+
+"!!命灯 −1　心魂 +2　你感觉自己轻了一点，像是背上卸下了什么。",
+  enter:function(){ applyEffects({hp:-1, sp:2, ins:1, flag:{needled:true}}); },
+  choices:[ { text:"出去", to:"village" } ]
+};
+
+SCENES.v_citang = {
+  title:"二 · 祠堂",
+  text:
+"祠堂是村里唯一一座砖房，门楣上没挂灯笼。\n\n"+
+"推门进去，一屋子的牌位，一层一层码到梁上。少说三百个。\n\n"+
+"你挨着看过去，每一个牌位上都有名字、有生辰，却没有卒年。最古怪的是——所有牌位的名字，都是一个人写的，笔迹一模一样。\n\n"+
+"正中的大案上摆着一本村志，翻开在第三十页。\n\n"+
+"第三十页被人撕去了半页。剩下的半页上，写着一行小字。",
+  choices:[
+    { text:"看那半页", to:"v_citang2" },
+    { text:"先数一数牌位", req:{ins:2}, to:"v_citang_count", use:"察觉 ≥ 2" }
+  ]
+};
+
+SCENES.v_citang_count = {
+  title:"二 · 三百零一",
+  text:
+"你从左边数到右边，又从上边数到下边。\n\n"+
+"三百零一个。\n\n"+
+"最后那一个牌位放在最下层，比别的都新，上面的墨还没干透。牌位上写着一个名字——\n\n"+
+"是你自己的名字。\n\n"+
+"你伸手去摸牌位，指腹上立刻沾了一层墨。你抬头看，梁上的蛛网里挂着一支毛笔，笔尖朝下，墨还在往下滴，滴在离你三步远的地上。\n\n"+
+">> 察觉 +2　心魂 −1　你不是第一个站在这里看名字的人。你的名字早就写好了。",
+  enter:function(){ applyEffects({ins:2, sp:-1, flag:{tablet:true}}); },
+  choices:[ { text:"看案上那半页村志", to:"v_citang2" } ]
+};
+
+SCENES.v_citang2 = {
+  title:"二 · 半页村志",
+  text:
+"剩下的半页上写着：\n\n"+
+"「……道光十七年，井水泛腥。村民议：以灯镇之。择童男女各一，入井为引。其一名箬，年七岁，善转陀螺……」\n\n"+
+"后面的字被撕掉了。撕口很新，毛边还翘着——是最近撕的。\n\n"+
+"你翻到下一页，什么都没有。整本村志只有这一页写了字，剩下全是空白。\n\n"+
+"你正要合上书，纸缝里掉出半张黄纸，落地的时候自己翻了过来。\n\n"+
+"上面写着你的姓名、生辰，还有一个字：献。\n\n"+
+"!!命灯 −1　你终于知道，这三个字是给谁准备的。",
+  enter:function(){ applyEffects({hp:-1, give:"banpage", flag:{did_citang:true, village_done:true}, ins:1}); },
+  choices:[ { text:"把半页黄纸收起来，出去", to:"village" } ]
+};
+
+SCENES.v_yaopu = {
+  title:"二 · 药铺",
+  text:
+"药铺里一股苦味。药斗子整整齐齐，每个抽屉上都贴着标签，字写得很秀气。\n\n"+
+"你拉开几个：当归、远志、黄芪、朱砂。都是好药，都是干的。\n\n"+
+"最下面一排抽屉是锁着的。锁是新的。\n\n"+
+"柜台上摊着一本账簿，最后一页写着一行字：\n\n"+
+"「三十年，合药三副。第一副与陈，第二副与周，第三副——未用。」",
+  choices:[
+    { text:"撬开最下面一排抽屉", to:"v_yaopu2" },
+    { text:"带走当归与远志（补气血）", to:"v_yaopu3" },
+    { text:"先看那本账簿的前几页", req:{ins:2}, to:"v_yaopu_read", use:"察觉 ≥ 2" }
+  ]
+};
+
+SCENES.v_yaopu_read = {
+  title:"二 · 账簿",
+  text:
+"你往前翻。前面全是药方，字很秀气，写得极认真。翻到中间，笔迹变了——变得潦草，字也少了：\n\n"+
+"「第七年。他还是不肯说名字。」\n"+
+"「第十三年。她说她不想回去了。」\n"+
+"「第二十一年。我把锁换了。不能再有人打开那些抽屉。」\n"+
+"「第二十九年。她的陀螺又转起来了。她在等谁？」\n\n"+
+"最后一页的落款，是一个你很熟悉、却想不起来在哪见过的名字。\n\n"+
+">> 察觉 +1　心魂 +1",
+  enter:function(){ applyEffects({ins:1, sp:1, flag:{ledger:true}}); },
+  choices:[
+    { text:"撬开最下面一排抽屉", to:"v_yaopu2" },
+    { text:"带走当归与远志", to:"v_yaopu3" }
+  ]
+};
+
+SCENES.v_yaopu2 = {
+  title:"二 · 锁着的抽屉",
+  text:
+"你用乌木针撬开了锁。抽屉里只有一样东西：一个布包，包着一枚青铜小镜。\n\n"+
+"你把镜子举起来。镜面照不清你的脸，镜子里是一间屋子——木窗、八仙桌、桌上摆着一碗没喝完的粥，粥上飘着热气。\n\n"+
+"你转身看：药铺里没有这间屋子。\n\n"+
+"你再看镜子，屋子的门开了，一个孩子跑进来，扑到桌边喝粥。她的脸被粥碗挡住了。\n\n"+
+">> 察觉 +1　你收起了铜镜。镜子里那间屋子，你好像住过。",
+  enter:function(){ applyEffects({ins:1, give:"tongjing", flag:{did_yaopu:true, village_done:true}}); },
+  choices:[ { text:"出去", to:"village" } ]
+};
+
+SCENES.v_yaopu3 = {
+  title:"二 · 两味药",
+  text:
+"你把当归和远志嚼了咽下去。苦，苦得舌根发麻。\n\n"+
+"咽下去之后，你胸口那盏灯的火苗稳了一些，不再一抖一抖的。\n\n"+
+"你顺手把抽屉里剩下的那把药也包走了。\n\n"+
+">> 命灯 +2　你收好药包。",
+  enter:function(){ applyEffects({hp:2, give:"yao", flag:{did_yaopu:true, village_done:true}}); },
+  choices:[
+    { text:"撬开最下面一排抽屉", to:"v_yaopu2" },
+    { text:"出去", to:"village" }
+  ]
+};
+
+SCENES.v_kezhan = {
+  title:"二 · 柜台底下",
+  text:
+"你回到客栈。掌柜的不在，柜台还是那样，抹布搭在角上。\n\n"+
+"柜台底下有个暗格，没有锁。里面是三本薄册子，一本一册，每本只写了一个人的事。\n\n"+
+"你翻开第一本：写得极细，从第一天到第四十九天，每天都记着那个人说了什么、吃了什么、什么时候开始沉默。最后一页只有两个字：「留下了。」\n\n"+
+"第二本一样。\n\n"+
+"第三本不一样。第三本记到第十九天，后面全是空白，只有末尾一行：\n\n"+
+"「她不肯说名字。我也没有办法了。」",
+  choices:[
+    { text:"把三本册子都烧了", to:"v_kezhan_burn" },
+    { text:"把第三本收起来，其余放回原处", to:"v_kezhan_keep" }
+  ]
+};
+
+SCENES.v_kezhan_burn = {
+  title:"二 · 三 本",
+  text:
+"你把三本册子塞进灯笼里。纸烧起来的时候，火不是红的，是青的。\n\n"+
+"青火升到半空，散成一大片，屋里忽然挤满了人——几十个、上百个，全都背对着你，肩膀一抽一抽的，像在哭，又像在笑。\n\n"+
+"有一个人回过头来。是掌柜的，年轻的掌柜的。他张了张嘴，你听见的却是自己的声音：\n\n"+
+"「谢谢你。」\n\n"+
+"火灭了，屋里空了。柜台上只剩下一小堆灰，灰里埋着一枚灯芯。\n\n"+
+"!!命灯 +1　心魂 −1　你拾起了那枚灯芯。",
+  enter:function(){ applyEffects({hp:1, sp:-1, ins:1, flag:{did_kezhan:true, village_done:true, wick:true}}); },
+  choices:[ { text:"出去", to:"village" } ]
+};
+
+SCENES.v_kezhan_keep = {
+  title:"二 · 一本",
+  text:
+"你把前两本放回暗格，把第三本塞进怀里。\n\n"+
+"出门的时候你回头看了一眼柜台——抹布还在，柜台后面多了一个人。掌柜的坐在那儿，正低头用抹布擦一只空碗，擦了七八遍。\n\n"+
+"他没有抬头，只说了一句：\n\n"+
+"「那本子你留着。她要是问起，就说我一直在擦碗。」\n\n"+
+">> 察觉 +1　心魂 +1",
+  enter:function(){ applyEffects({ins:1, sp:1, flag:{did_kezhan:true, village_done:true, book3:true}}); },
+  choices:[ { text:"出去", to:"village" } ]
+};
+
+/* ---------- 第二章 · 井下 ---------- */
+SCENES.ch2_follow = {
+  title:"三 · 灰 地",
+  text:
+"你跟着歌声走。\n\n"+
+"灰白的地上没有脚印，可歌声一直离你七步远——你走快，它也快；你停下，它就在前面不远处轻轻哼着。\n\n"+
+"走着走着，你发现两侧堆的东西不太对。\n\n"+
+"那不是骨头，是碗。成千上万只碗，倒扣着码成两堵墙，一只叠一只，一直叠到看不见顶的地方。\n\n"+
+"歌声停了。有个孩子在你正前方说：\n\n"+
+"「你走得比前三个都慢。」",
+  choices:[
+    { text:"「阿箬？」", to:"ch2_aru" },
+    { text:"问：「前三个现在在哪儿？」", req:{ins:2}, to:"ch2_where", use:"察觉 ≥ 2" }
+  ]
+};
+
+SCENES.ch2_dig = {
+  title:"三 · 灰下的东西",
+  text:
+"你蹲下来，用手扒开脚下的灰。\n\n"+
+"灰很薄，底下一层是硬土；再往下，是木板；再往下——是瓦。\n\n"+
+"你扒出一个屋顶。\n\n"+
+"整片灰地上，铺着几十个屋顶。你脚下就是其中一个，瓦缝里还长着干枯的草。\n\n"+
+"这不是地。这是村子。是三十年前那个村子，被人盖在了下面。\n\n"+
+">> 察觉 +2　心魂 −1　你脚下的瓦忽然碎了一块，你陷下去半只脚，脚踝被什么东西攥了一下——很软，像一只手。",
+  enter:function(){ applyEffects({ins:2, sp:-1, flag:{villageUnder:true}}); },
+  choices:[
+    { text:"抽脚，跟着歌声走", to:"ch2_follow" },
+    { text:"低头，往碎瓦的洞里看", req:{ins:3}, to:"ch2_hole", use:"察觉 ≥ 3" }
+  ]
+};
+
+SCENES.ch2_hole = {
+  title:"三 · 洞里的眼睛",
+  text:
+"你趴下去，往洞里看。\n\n"+
+"洞里也是一间屋子。屋里的八仙桌上摆着一碗粥，粥上还飘着热气，桌边坐着一个孩子，正低头喝粥。\n\n"+
+"她抬起头，和你对上眼。\n\n"+
+"她的眼睛是空的——两个正好透光的窟窿。\n\n"+
+"你和她隔着三十年的瓦片对看，谁也没有动。最后是她先开口，声音从灰里传上来，很闷：\n\n"+
+"「你在上面冷不冷？我在下面已经不冷了。」\n\n"+
+"!!心魂 −2　你终于认出了那间屋子——是铜镜里的那间。你住过。",
+  enter:function(){ applyEffects({sp:-1, ins:1, flag:{metAruo:true, sawRoom:true}}); },
+  choices:[
+    { text:"跟着歌声走", to:"ch2_follow" }
+  ]
+};
+
+SCENES.ch2_where = {
+  title:"三 · 前三个",
+  text:
+"「前三个现在在哪儿？」\n\n"+
+"歌声停了很久。然后你听见那孩子笑了起来，笑声很干净，一点恶意都没有。\n\n"+
+"「第一个在这里，」她说，「第二个也在这里，第三个——第三个出去了。」\n\n"+
+"「他们是什么？」\n\n"+
+"「碗啊。」她说得理所当然，「摆在两边的都是。你数一数，三百多只。他们进来了，就不想走了。我也没让他们走。」\n\n"+
+">> 察觉 +1　你看了看两侧的碗墙。有几只碗沿上还挂着一点新泥。",
+  enter:function(){ applyEffects({ins:1, flag:{bowls:true}}); },
+  choices:[
+    { text:"继续往前走", to:"ch2_aru" }
+  ]
+};
+
+SCENES.ch2_aru = {
+  title:"三 · 阿 箬",
+  text:
+"前方三尺处，灰地上坐着一个小小的身影，背对着你，手里转着什么东西。\n\n"+
+"你走近。她转的是一只木陀螺。陀螺转得极稳，一圈一圈，没有声音。\n\n"+
+"「你来了。」她没有回头，「我等了三十年。我数着日子，一共一万零九百五十天。」\n\n"+
+"「你怎么知道我一定会来？」\n\n"+
+"陀螺停了。她站起来，转过来。\n\n"+
+"她穿着靛蓝布衫，扎两个髻，手里攥着一只虎头鞋。她的眼睛是空的，可你看得出来，她在笑。\n\n"+
+"「因为你和我一样啊。」她说，「你也没有名字。」",
+  enter:function(){ applyEffects({flag:{metAruo:true}, ins:1}); },
+  choices:[
+    { text:"「我有名字。」", to:"ch2_have_name" },
+    { text:"「我确实记不起自己的名字。」", to:"ch2_no_name" },
+    { text:"把虎头鞋还给她", req:{flag:"shoe"}, use:"虎头鞋", to:"ch2_give_shoe" },
+    { text:"把那只陀螺的影子拿出来", req:{item:"tuo"}, use:"木陀螺（影）", to:"ch2_give_tuo" },
+    { text:"问她要那只陀螺", req:{notFlag:"gotTuo"}, to:"ch2_ask_tuo" }
+  ]
+};
+
+SCENES.ch2_ask_tuo = {
+  title:"三 · 陀 螺",
+  text:
+"「你这只陀螺，」你说，「给我看看行不行？」\n\n"+
+"阿箬低头看了看自己的手，又看了看你。她把陀螺放在灰地上，往你这边推了一寸。\n\n"+
+"你伸手去拿。指尖碰到陀螺的时候，陀螺忽然自己转了起来。\n\n"+
+"转了三圈，你手心里多了一样东西——不是陀螺，是一只木陀螺的形，很轻，像一块空壳。灰地上那只还在她手里。\n\n"+
+"「你拿的是影子，」她说，「影子给你，我就知道你会回来。」\n\n"+
+"!!得到：木陀螺（影）　心魂 +1",
+  enter:function(){ applyEffects({sp:1, give:"tuo", flag:{gotTuo:true}, ins:1}); },
+  choices:[
+    { text:"「我有名字。」", to:"ch2_have_name" },
+    { text:"「我确实记不起自己的名字。」", to:"ch2_no_name" },
+    { text:"把虎头鞋还给她", req:{flag:"shoe"}, use:"虎头鞋", to:"ch2_give_shoe" },
+    { text:"把那只陀螺的影子拿出来", req:{item:"tuo"}, use:"木陀螺（影）", to:"ch2_give_tuo" }
+  ]
+};
+
+SCENES.ch2_give_shoe = {
+  title:"三 · 虎头鞋",
+  text:
+"你把那只小鞋放在她手里。\n\n"+
+"她的手指很凉，凉得像井水。她攥住鞋，很久没有说话。\n\n"+
+"「鞋是我自己丢的，」她终于说，「我丢在草里，想让别人捡到。捡到的人就会来找我。」\n\n"+
+"「找到了你有用吗？」\n\n"+
+"「有用。」她说，「有人来找我，我就不是白死的。」\n\n"+
+"她把鞋抱在胸口。你发现，她的手背上慢慢浮起了一层颜色——很淡，很脏，像很久没见过的血色。\n\n"+
+"!!心魂 +2　她对你笑了一下。",
+  enter:function(){ applyEffects({sp:2, flag:{aruWarm:true}}); },
+  choices:[
+    { text:"「我带你出去。」", to:"ch2_take_her" },
+    { text:"「告诉我，三十年前发生了什么。」", to:"ch2_story" }
+  ]
+};
+
+SCENES.ch2_give_tuo = {
+  title:"三 · 陀螺影",
+  text:
+"你把那只空壳一样的陀螺影子放在灰地上，替它拧了一下。\n\n"+
+"它转起来了。灰被带起来一圈一圈往上卷，卷到半人高的时候，灰里浮出很多影子：七八个大人，一口井，一个孩子。\n\n"+
+"「你看，」阿箬说，「他们当年就是这样围着我看的。」\n\n"+
+"影子里的孩子开始哭。蹲着的人在她耳边说了一句话，孩子立刻不哭了，自己往井边走。\n\n"+
+"「他说什么？」你问。\n\n"+
+"「他说：阿箬，你只要走下去，爹娘就能活。」她看着陀螺慢慢停下，「我信了。」\n\n"+
+">> 察觉 +2　心魂 −1　你胸口那盏灯，火苗抖得像要熄。",
+  enter:function(){ applyEffects({ins:2, sp:-1, flag:{aruStory:true, sawRitual:true}}); },
+  choices:[
+    { text:"「我带你出去。」", to:"ch2_take_her" },
+    { text:"「谁教他说的这句话？」", req:{ins:4}, to:"ch2_who", use:"察觉 ≥ 4" }
+  ]
+};
+
+SCENES.ch2_who = {
+  title:"三 · 谁教他的",
+  text:
+"「谁跟他说的这句话？」\n\n"+
+"阿箬抬头看你。她空着的眼眶里，忽然有一点极亮的青色在动——那是你怀里的灯，映在她的窟窿里。\n\n"+
+"「一个有灯的人。」她说，「和你的灯一模一样。」\n\n"+
+"「他叫什么？」\n\n"+
+"「他没有名字。」她说，「他把名字给了别人，换了一盏灯。他就是靠这个，活了三百多年。」\n\n"+
+">> 察觉 +2　你明白了：这村里所有人的名字，都被收在一处。收名字的人，此刻正在山道上等你。",
+  enter:function(){ applyEffects({ins:2, flag:{knowDaoist:true}}); },
+  choices:[ { text:"「我带你出去。」", to:"ch2_take_her" } ]
+};
+
+SCENES.ch2_have_name = {
+  title:"三 · 名 字",
+  text:
+"「我有名字。」你说，然后你张开嘴。\n\n"+
+"你张着嘴，一个字也吐不出来。\n\n"+
+"名字就在舌尖上，像一颗含了很多年的糖，你明明知道它是甜的，可你一咬，它就没了。\n\n"+
+"阿箬看着你，一点也不意外。\n\n"+
+"「你看，」她说，「你也没有。」\n\n"+
+"!!心魂 −2　你冷汗下来了。",
+  enter:function(){ applyEffects({sp:-1, flag:{nameLost:true}}); },
+  choices:[
+    { text:"「我确实记不起自己的名字。」", to:"ch2_no_name" },
+    { text:"把虎头鞋还给她", req:{flag:"shoe"}, use:"虎头鞋", to:"ch2_give_shoe" }
+  ]
+};
+
+SCENES.ch2_no_name = {
+  title:"三 · 没有名字的人",
+  text:
+"「我确实记不起自己的名字。」\n\n"+
+"阿箬点点头，像是早就知道答案。\n\n"+
+"「那你就留下来陪我，」她说得很认真，「两个人一起等，比一个人等好受些。你在这里不会冷，也不会饿。你只要——」\n\n"+
+"她抬起手，指向你胸口那盏灯。\n\n"+
+"「把它给我。」",
+  choices:[
+    { text:"把灯给她", danger:true, to:"ch2_give_light" },
+    { text:"「不行。我答应过谁，这盏灯不能给任何人。」", to:"ch2_refuse" },
+    { text:"「你先告诉我，你到底想要什么？」", req:{ins:3}, to:"ch2_story", use:"察觉 ≥ 3" }
+  ]
+};
+
+SCENES.ch2_give_light = {
+  title:"三 · 交 灯",
+  text:
+"你把铜灯放进了她手里。\n\n"+
+"她的手是空的，握不住。灯穿过她的手掌，掉在灰地上，火苗歪了一下。\n\n"+
+"「你还是想给我的。」她轻声说。\n\n"+
+"「我给不了。」\n\n"+
+"「没关系。」她蹲下去，把灯捧起来，还给你，「你能这么想，我就高兴。」\n\n"+
+"你接过灯的一瞬，灯芯忽然亮得很旺。灯火里有一闪而过的画面：一间屋子，一个孩子在喝粥，你在旁边看着，很困。\n\n"+
+"!!命灯 +1　心魂 +2　她把手背给你看——上面有了一点点血色。",
+  enter:function(){ applyEffects({hp:1, sp:2, ins:1, flag:{aruWarm:true}}); },
+  choices:[
+    { text:"「告诉我，三十年前发生了什么。」", to:"ch2_story" }
+  ]
+};
+
+SCENES.ch2_refuse = {
+  title:"三 · 拒 绝",
+  text:
+"「不行。我答应过谁，这盏灯不能给任何人。」\n\n"+
+"阿箬的脸一下子空了。不是表情空，是整张脸往里凹了一下，像被谁从背后吸了一口。\n\n"+
+"灰地上的灰开始往上飘。两侧的碗墙哗啦作响，几百只碗一起翻过来，碗底全部朝着你。\n\n"+
+"每一只碗底，都刻着一个名字。\n\n"+
+"「你答应过谁？」她的声音变得很尖，「你连自己是谁都不记得，你答应过谁？」\n\n"+
+"!!命灯 −2　心魂 −1　你退了一步，脚下的灰里伸出一只手，抓住了你的脚踝。",
+  enter:function(){ applyEffects({hp:-2, sp:-1, flag:{aruAngry:true}}); },  choices:[
+    { text:"「有人答应过我。我记起来了。」", req:{ins:5}, to:"ch2_story", use:"察觉 ≥ 5" },
+    { text:"用乌木针扎那只手", req:{item:"zhen"}, use:"乌木针", to:"ch2_needle_hand" },
+    { text:"站着不动，任她看", to:"ch2_stand" }
+  ]
+};
+
+SCENES.ch2_needle_hand = {
+  title:"三 · 一 针",
+  text:
+"你抽出乌木针，扎进抓着你脚踝的那只手背。\n\n"+
+"没有血。针尖上挑出一缕白丝，白丝在空中一抖，化成了一声很短的、孩子的哭。\n\n"+
+"抓住你的手松开了，缩回灰里。\n\n"+
+"阿箬站在原地，整个人小了一圈。\n\n"+
+"「你扎到我了。」她说。\n\n"+
+"!!心魂 −1　命灯 +1　你听见几百只碗一起叹了口气。",
+  enter:function(){ applyEffects({hp:1, sp:-1, ins:1, flag:{prickedHer:true}}); },
+  choices:[
+    { text:"「对不起。告诉我发生了什么。」", to:"ch2_story" }
+  ]
+};
+
+SCENES.ch2_stand = {
+  title:"三 · 站着",
+  text:
+"你站着不动，任她看。\n\n"+
+"那只手在你脚踝上越攥越紧，紧到你以为骨头要断了。你没有动。\n\n"+
+"很久之后，手松开了。灰慢慢落回去。\n\n"+
+"「你怎么不跑？」她问，声音又变回了一个孩子。\n\n"+
+"「跑了也是在这个村子里，」你说，「跑什么。」\n\n"+
+"她笑了一声。这是你进村以来，第一次听见真正像活人的笑声。\n\n"+
+"!!心魂 +2　你的脚踝上没有伤，只有一圈很浅的白印。",
+  enter:function(){ applyEffects({sp:2, flag:{aruWarm:true}}); },
+  choices:[
+    { text:"「告诉我，三十年前发生了什么。」", to:"ch2_story" }
+  ]
+};
+
+SCENES.ch2_story = {
+  title:"三 · 三十年前",
+  text:
+"阿箬坐回灰地上，把陀螺拧了一下。陀螺转着，灰又浮起来，围成一个圈。\n\n"+
+"「三十年前，村里人生病。井水发腥，喝了的人身上开始长黑斑。有人说是井里有东西。」\n\n"+
+"「他们找了个有灯的人。那人说，要两只活的，一男一女，扔进井里做引子，灯火就能镇住井。」\n\n"+
+"「一个是男娃，姓陈，五岁。另一个是我。」\n\n"+
+"陀螺晃了一下。\n\n"+
+"「那个男娃半路上被他娘抢回去了。所以我一个人下去的。」\n\n"+
+"她抬起头。\n\n"+
+"「可是井没镇住。他们还是长黑斑，还是死。所以第二年，他们又找了一个——那一个，是外乡人。他自己走进井里的。他走的时候，把名字留在了村里的纸上。」",
+  enter:function(){ applyEffects({flag:{aruStory:true}, ins:2, sp:-1}); },
+  choices:[
+    { text:"「那个外乡人是谁？」", req:{item:"banpage"}, to:"ch2_outsider", use:"半页黄纸" },
+    { text:"「我会带你出去。」", to:"ch2_take_her" },
+    { text:"「你要我做什么？」", to:"ch2_ask_want" }
+  ]
+};
+
+SCENES.ch2_outsider = {
+  title:"三 · 外乡人",
+  text:
+"你把半页黄纸拿出来，摊在灰地上。\n\n"+
+"阿箬伸出手指，在“献”字上按了一下。灰地上立刻浮出那个字，你看见「献」的偏旁慢慢散开，重新拼成了另一个字：\n\n"+
+"「还」。\n\n"+
+"「他不是被献的，」阿箬说，「他是来还债的。他欠了这个村子一条命，所以用自己来还。」\n\n"+
+"「那……我是谁？」\n\n"+
+"「你是他留下来的那半盏灯。」她看着你怀里的铜灯，「灯里有一半是他，一半是你。他自己不敢回来，就让你回来。」\n\n"+
+">> 察觉 +2　你终于明白，为什么灯不能交给任何人——交出去，你就不再是你。",
+  enter:function(){ applyEffects({ins:2, flag:{truthOutsider:true}}); },
+  choices:[
+    { text:"「我要见那个有灯的人。」", to:"ch2_take_her" },
+    { text:"「那你想要什么？」", to:"ch2_ask_want" }
+  ]
+};
+
+SCENES.ch2_ask_want = {
+  title:"三 · 她要什么",
+  text:
+"「你要我做什么？」\n\n"+
+"阿箬想了很久。她低头看着自己的手——那双手是半透明的，能看见灰地。\n\n"+
+"「我想要有人叫我一声。」她说，「叫我的名字，不是在这儿叫，是站在井上面叫。我在这下面听见了，就知道我还是个人。」\n\n"+
+"「还有——」\n\n"+
+"她抬起空着的眼睛。\n\n"+
+"「你把我的名字写下来。写在纸上，写在墙上都行。只要有名字，我就能走得出去。我不想再转了，我转了三十年陀螺了。」",
+  enter:function(){ applyEffects({flag:{aruWish:true}, ins:1, sp:1}); },
+  choices:[
+    { text:"「好。我带你出去。」", to:"ch2_take_her" }
+  ]
+};
+
+SCENES.ch2_take_her = {
+  title:"三 · 带她出去",
+  text:
+"你伸出手。\n\n"+
+"阿箬看着你的手，没有立刻握上来。\n\n"+
+"「你想清楚了？」她说，「我要是出去了，总得占个地方。你要是带我走，你的名字就得留在这儿替我。」\n\n"+
+"「什么意思？」\n\n"+
+"「井底是有规矩的。一个人下去，得有一个名字留下来。你不留名字，就得留命。你留命，就得留名字。」\n\n"+
+"她把陀螺收了。\n\n"+
+"「想清楚了再回答。我不急，我已经等了三十年。」",
+  choices:[
+    { text:"「我用我的名字换她。写吧。」", danger:true, to:"ch2_sign" },
+    { text:"「我用一半。我把半盏灯留在这儿。」", req:{item:"bijian"}, to:"ch2_half", use:"碧简灯" },
+    { text:"「我什么都换不了。你自己走。」", to:"ch2_walk" },
+    { text:"「谁定的这个规矩？」", req:{ins:5}, to:"ch2_rule", use:"察觉 ≥ 5" }
+  ]
+};
+
+SCENES.ch2_rule = {
+  title:"三 · 规 矩",
+  text:
+"「谁定的这个规矩？」\n\n"+
+"阿箬没有回答。她只是抬起手，指了指你怀里那盏灯。\n\n"+
+"你低头看灯。青色的火苗里面，浮着一行很小的字，像是有人在灯芯上刻过：\n\n"+
+"「一命换一命，一名换一名。」\n\n"+
+"「这条规矩，是你带下来的。」阿箬说，「三十年前，你把它刻在灯上。为了让我别闹。」\n\n"+
+"你看着火苗，手心全是汗。\n\n"+
+">> 察觉 +2　你意识到：定规矩的人，就是当年劝她下井的那个人，也就是——你自己。",
+  enter:function(){ applyEffects({ins:2, sp:-2, flag:{ruleByYou:true}}); },
+  choices:[
+    { text:"「我用我的名字换她。」", danger:true, to:"ch2_sign" },
+    { text:"「我用一半。把半盏灯留在这儿。」", req:{item:"bijian"}, to:"ch2_half", use:"碧简灯" },
+    { text:"「我什么都换不了。你自己走。」", to:"ch2_walk" }
+  ]
+};
+
+SCENES.ch2_sign = {
+  title:"三 · 签 名",
+  text:
+"你咬破手指，在灰地上写下自己的名字。\n\n"+
+"写到最后一笔的时候，你忽然想不起自己写的是什么了。你低头看地上——灰已经把那三个字吃掉，只剩三个浅浅的坑。\n\n"+
+"阿箬站起来，身上第一次有了颜色。靛蓝的布衫，红的发绳，脸上有血色。她转身朝来路走，走三步，回过头。\n\n"+
+"「你叫什么？」她问。\n\n"+
+"你张了张嘴。\n\n"+
+"你答不上来。\n\n"+
+"!!你的名字留在了井底。从此刻起，你是一个没有名字的人。\n"+
+">> 察觉 +1　心魂 +1　命灯 +1",
+  enter:function(){ applyEffects({hp:1, sp:1, ins:1, flag:{gaveName:true, nameLost:true, aruFree:true}}); },
+  choices:[
+    { text:"跟着她向上走", to:"ch2_up" }
+  ]
+};
+
+SCENES.ch2_half = {
+  title:"三 · 半盏灯",
+  text:
+"你把铜灯拆开。灯座和灯芯是可以分开的——你从来没试过，可你的手知道怎么拆。\n\n"+
+"你把灯座留在灰地上，把灯芯收进怀里。\n\n"+
+"「这样不算数。」阿箬说。\n\n"+
+"「算不算数，让别人去说。」你把灯座推到她脚边，「你拿着这个。我上去以后，站在井口叫你三声。你听见了，就往上走。有人拦你，你就拿这盏灯照他。」\n\n"+
+"她弯腰去捧灯座。这一次，她捧住了。\n\n"+
+"她的手指上有了颜色。\n\n"+
+"!!心魂 +2　命灯 −1　那半盏灯离开你的时候，你胸口空了一块，冷得像漏风。",
+  enter:function(){ applyEffects({hp:-1, sp:2, ins:1, flag:{halfLamp:true, aruFree:true}}); },
+  choices:[
+    { text:"向上走", to:"ch2_up" }
+  ]
+};
+
+SCENES.ch2_walk = {
+  title:"三 · 你自己走",
+  text:
+"「我什么都换不了。你自己走。」\n\n"+
+"阿箬安静地看着你。看了很久。\n\n"+
+"「你以为我走不了，是吗？」\n\n"+
+"她转过身，往来路走。走了七步，灰地上忽然立起一道墙——是碗墙，几百只碗自己码起来，挡住了她。\n\n"+
+"她伸手去推。碗没有动。\n\n"+
+"她又走回来，坐在原处，把陀螺拧起来。\n\n"+
+"「你看，」她说，声音一点起伏都没有，「我说过我不急。」\n\n"+
+"!!心魂 −2　你转身要走了，背后那个陀螺一直转着，转得很稳，很轻。",
+  enter:function(){ applyEffects({sp:-2, flag:{leftHer:true}}); },
+  choices:[
+    { text:"回头，重新选择", to:"ch2_take_her" },
+    { text:"不回头，向上走", to:"ch2_up_alone" }
+  ]
+};
+
+/* ---------- 第二章 · 向上 ---------- */
+SCENES.ch2_up = {
+  title:"四 · 向上",
+  text:
+"你顺着来路往上走。走了很久，头上还是一片黑。\n\n"+
+"你回头——阿箬跟在你后面七步远，安安静静地走。她不说话，只在你停下来的时候也停下来。\n\n"+
+"再往上，路分成了两条：\n\n"+
+"左边是一条石阶，阶上刻着很多字，越往上字越密，最后糊成一片。\n"+
+"右边是一条湿滑的土坡，坡顶透出一点红光——是村子里的灯笼。",
+  choices:[
+    { text:"走左边石阶（似乎通向更深处）", to:"ch3_palace" },
+    { text:"走右边土坡（回村子）", to:"ch2_back" },
+    { text:"先看石阶上的字", req:{ins:3}, to:"ch2_steps", use:"察觉 ≥ 3" }
+  ]
+};
+
+SCENES.ch2_up_alone = {
+  title:"四 · 一个人向上",
+  text:
+"你一个人往上走。走了很久，头上还是一片黑。\n\n"+
+"身后没有脚步声，也没有陀螺声。安静得让你难受。\n\n"+
+"再往上，路分成了两条：左边是一条刻满字的石阶，右边是一条透出红光的土坡。",
+  enter:function(){ applyEffects({sp:-1}); },
+  choices:[
+    { text:"走左边石阶", to:"ch3_palace" },
+    { text:"走右边土坡，回村子", to:"ch2_back" },
+    { text:"先看石阶上的字", req:{ins:3}, to:"ch2_steps", use:"察觉 ≥ 3" }
+  ]
+};
+
+SCENES.ch2_steps = {
+  title:"四 · 阶上的字",
+  text:
+"你蹲下来看石阶上的字。\n\n"+
+"最下面几阶刻得很清楚：一些人的名字，一些人的生辰。往上走，字迹开始潦草，名字开始重复——同一个人，出现两次、三次、七次。\n\n"+
+"再往上，字已经不成形了，只剩下一个反复刻划的偏旁。\n\n"+
+"最上一阶上，什么字也没有，只有两个深深的手印，像是有人在这里撑着地，往上爬了很久，最后没爬上去。\n\n"+
+">> 察觉 +2　心魂 −1　你把手放进那两个手印里——大小正好。",
+  enter:function(){ applyEffects({ins:2, sp:-1, flag:{handprints:true}}); },
+  choices:[
+    { text:"上石阶", to:"ch3_palace" },
+    { text:"回村子", to:"ch2_back" }
+  ]
+};
+
+SCENES.ch2_back = {
+  title:"四 · 回 村",
+  text:
+"你钻出井口的时候，天还是亮的。\n\n"+
+"你回头看井里，井水平静得像什么都没发生过。\n\n"+
+"你身上多了一样看不见的东西——你知道有人在井底看着你，等你办完事。\n\n"+
+"村里还是没有一个活人。但这一次，所有的灯笼都朝着一个方向挂着：村后那条上山的路。",
+  choices:[
+    { text:"上山", to:"ch4_road" },
+    { text:"再下井一次，走那条石阶", to:"ch3_palace" }
+  ]
+};
+
+/* ---------- 第三章 · 地下宫 ---------- */
+SCENES.ch3_palace = {
+  title:"五 · 地下宫",
+  text:
+"石阶的尽头是一道门。门是两扇黑石，门上没有锁，只有一个凹槽——巴掌大，正好是一盏灯的形状。\n\n"+
+"门边的石壁上刻着八个字：\n\n"+
+"# 灯在人在，灯灭人还\n\n"+
+"你站在门前，怀里那盏青灯的火苗安安静静。你身后七步远，阿箬站着，不催你。\n\n"+
+"门缝里渗出一点暖光。里面有人，很多很多人。",
+  choices:[
+    { text:"把灯按进凹槽里", to:"ch3_open_light" },
+    { text:"用乌木针撬门缝", req:{item:"zhen"}, to:"ch3_open_needle", use:"乌木针" },
+    { text:"先绕门外走一圈，看看有没有别的路", req:{ins:3}, to:"ch3_walk_around", use:"察觉 ≥ 3" },
+    { text:"拿出青铜镜，照一照这扇门", req:{item:"tongjing"}, to:"ch3_mirror", use:"青铜小镜" },
+    { text:"敲门", to:"ch3_knock" }
+  ]
+};
+
+SCENES.ch3_mirror = {
+  title:"五 · 镜中之字",
+  text:
+"你把青铜小镜举起来，对着门照。\n\n"+
+"镜子里，门上那八个字是反的。你一个一个往下读：\n\n"+
+"「还人灭灯，在人光灯」\n\n"+
+"反过来的字，念通顺了，是另外一句话：\n\n"+
+"# 灯就是人，人就是灯\n\n"+
+"你放下镜子，再看门上的字，依然是「灯在人在，灯灭人还」。\n\n"+
+">> 察觉 +2　你想明白了：这扇门不吃灯，它吃的是“人”这个字。你把灯按进去，其实交出去的是自己。",
+  enter:function(){ applyEffects({ins:2, flag:{mirrorDoor:true}, sp:-1}); },
+  choices:[
+    { text:"用乌木针撬门缝", req:{item:"zhen"}, to:"ch3_open_needle", use:"乌木针" },
+    { text:"敲门", to:"ch3_knock" },
+    { text:"回到门外，绕一圈找别的路", to:"ch3_walk_around" }
+  ]
+};
+
+SCENES.ch3_knock = {
+  title:"五 · 敲 门",
+  text:
+"你敲了三下。\n\n"+
+"门里的声音立刻停了。\n\n"+
+"然后，从门缝里传出一个很温和的男人的声音，近得像贴着门板：\n\n"+
+"「进来罢。门本来就给你留着的。」\n\n"+
+"你问：「你是谁？」\n\n"+
+"「一个替你看了三十年门的人。」他说，「你要是怕，就把灯留在外面。空着手进来，我也见你。」\n\n"+
+">> 记住：灯不能交给任何人。可他不让你交，他让你留。",
+  choices:[
+    { text:"把灯留在门外，推门进去", danger:true, to:"ch3_enter_nolight" },
+    { text:"不带灯也不进，先绕一圈看看", req:{ins:3}, to:"ch3_walk_around", use:"察觉 ≥ 3" },
+    { text:"把灯按进凹槽，推门进去", to:"ch3_open_light" }
+  ]
+};
+
+SCENES.ch3_open_light = {
+  title:"五 · 门 开",
+  text:
+"你把灯按进凹槽。铜灯和黑石严丝合缝，像是本来就从这里取下来的。\n\n"+
+"门里的光一下子全涌出来——不是火光，是灯火。成千上万盏小小的青灯，悬在半空，每一盏下面都站着一个人。\n\n"+
+"他们全都背对着你。\n\n"+
+"门开着，灯还嵌在石上，你要拿回来，就得走回去三步。\n\n"+
+">> 察觉 +1　你数了一下：灯比人多。",
+  enter:function(){ applyEffects({ins:1, flag:{doorOpen:true}}); },
+  choices:[
+    { text:"先取回自己的灯，再进去", to:"ch3_take_back" },
+    { text:"不管灯了，直接进去", danger:true, to:"ch3_enter_nolight" }
+  ]
+};
+
+SCENES.ch3_take_back = {
+  title:"五 · 取回",
+  text:
+"你走回去三步，把灯从凹槽里拔出来。\n\n"+
+"石壁发出一声很轻的响，像有人咂了一下嘴。\n\n"+
+"你转身进门。这一次，门里的上千盏灯同时暗了一瞬，再亮起来时，所有的灯都比刚才低了一寸。\n\n"+
+"那些背对着你的人，全都朝着门的方向，微微侧了侧头。\n\n"+
+">> 察觉 +1　你走进去了。",
+  enter:function(){ applyEffects({ins:1, flag:{keptLamp:true, doorOpen:true}}); },
+  choices:[
+    { text:"往里走", to:"ch3_hall" }
+  ]
+};
+
+SCENES.ch3_open_needle = {
+  title:"五 · 撬 门",
+  text:
+"你把乌木针插进门缝，往上一挑。\n\n"+
+"针断了。断口上冒出一缕白丝，白丝顺着门缝钻了进去。\n\n"+
+"门里"+
+"传来一阵很轻的骚动，像是有很多人同时松了口气。然后门自己开了一条缝，缝里伸出一只手，手掌向上，像在讨东西。\n\n"+
+"「针，」门里那个温和的声音说，「你送进来的针，我收下了。人也请进。」\n\n"+
+"!!失去：乌木针　命灯 +1（你身上少了一样扎人的东西，反而舒服）",
+  enter:function(){ applyEffects({hp:1, take:"zhen", flag:{doorOpen:true, needleGiven:true}}); },
+  choices:[
+    { text:"从那道缝里进去", to:"ch3_hall" }
+  ]
+};
+
+SCENES.ch3_walk_around = {
+  title:"五 · 门外一圈",
+  text:
+"你沿着石壁走。走了几十步，石壁上出现了一扇更小的门，只有三尺高，像是给孩子留的。\n\n"+
+"门上刻着两个小字：「出路」。\n\n"+
+"你推了一下，门是锁的。锁孔的形状很奇怪——不是圆的，是一个陀螺底下的尖。\n\n"+
+"你回头看阿箬。她也看着那扇门，一动不动。\n\n"+
+">> 察觉 +2　她没有说你什么，可你知道：这门她进不去。她三十年前就是从这扇门被推进去的。",
+  enter:function(){ applyEffects({ins:2, flag:{smallDoor:true}, sp:-1}); },
+  choices:[
+    { text:"回到大门前", to:"ch3_palace" },
+    { text:"问阿箬：「这扇门后面是什么？」", to:"ch3_ask_door" }
+  ]
+};
+
+SCENES.ch3_ask_door = {
+  title:"五 · 门后",
+  text:
+"「这扇门后面是什么？」\n\n"+
+"阿箬看着那扇小门，很久。\n\n"+
+"「后面是山，」她说，「有风，有草，有白天。三十年前，我娘就是从这儿把我哄进去的。她说，进去就能看见春天。」\n\n"+
+"「你看见了吗？」\n\n"+
+"「看见了。」她说，「我进去的那一天，是三月。我看见的春天，只有那一眼。」\n\n"+
+"她把脸转开。\n\n"+
+"!!心魂 −1　你记住了那扇门的锁孔。",
+  enter:function(){ applyEffects({sp:-1, flag:{knowSmallDoor:true}, ins:1}); },
+  choices:[
+    { text:"回到大门前", to:"ch3_palace" }
+  ]
+};
+
+SCENES.ch3_enter_nolight = {
+  title:"五 · 空 手",
+  text:
+"你把灯留在门外，空着手走进去。\n\n"+
+"门在你身后合上。\n\n"+
+"上千盏灯悬在头顶，每一盏下面站着一个背对着你的人。他们都不动。灯很亮，亮得你眼睛疼。\n\n"+
+"你走了十几步，忽然发现一件事：\n\n"+
+"所有的影子都朝着一个方向倒——朝着门。也就是说，灯不在你头顶，灯在你身后。\n\n"+
+"你慢慢回头。\n\n"+
+"门不见了。那盏铜灯悬在原来门的位置上，火苗很大，很旺，比在你怀里的时候旺十倍。\n\n"+
+"!!命灯 −3　心魂 −1　你把灯丢在了门外，门就是灯。",
+  enter:function(){ applyEffects({hp:-3, sp:-1, flag:{lostLamp:true}}); },
+  choices:[
+    { text:"走过去，把灯摘下来", to:"ch3_retrieve" },
+    { text:"不碰灯，继续往里走", danger:true, to:"ch3_hall" }
+  ]
+};
+
+SCENES.ch3_retrieve = {
+  title:"五 · 摘 灯",
+  text:
+"你走到灯前，伸手把它摘下来。\n\n"+
+"灯一离位，所有的光都灭了。\n\n"+
+"黑暗里有上千个人一起吸气的声音，很长，很慢，像一口井在呼吸。\n\n"+
+"然后是那个温和的男声，就在你耳边：\n\n"+
+"「有灯的人，果然舍不得。」\n\n"+
+">> 察觉 +1　灯回到你怀里，比刚才轻。你知道它轻掉的是什么——是你的一部分。",
+  enter:function(){ applyEffects({ins:1, flag:{keptLamp:true}, sp:-1}); },
+  choices:[
+    { text:"往里走", to:"ch3_hall" }
+  ]
+};
+
+SCENES.ch3_hall = {
+  title:"六 · 千灯之厅",
+  text:
+"厅是圆的，没有柱子，头顶的黑暗里没有顶。\n\n"+
+"上千盏青灯悬在空中，每一盏下面站着一个人，全部背对着厅中央。他们穿着不同年代的衣服：短褐、长衫、军装、印花布衫。他们全都很安静。\n\n"+
+"厅中央有一张石案，石案上摊着一本极大的簿子，翻开着。\n\n"+
+"案后坐着一个人，穿灰布道袍，头上有髻，脸很年轻，年轻得不像话。他正低头用毛笔写字，一笔一笔，写得很慢。\n\n"+
+"「来了。」他没有抬头，「你先别说话。等我写完这一页。」\n\n"+
+"你等了一会儿。他写完最后一笔，把笔搁下，抬起头。\n\n"+
+"他的脸，和你一模一样。",
+  enter:function(){ applyEffects({flag:{metTwin:true}}); },
+  choices:[
+    { text:"「你是谁？」", to:"ch3_twin1" },
+    { text:"直接掀翻石案上的簿子", danger:true, to:"ch3_flip" },
+    { text:"先看清簿子上写的是什么", req:{ins:3}, to:"ch3_book", use:"察觉 ≥ 3" }
+  ]
+};
+
+SCENES.ch3_book = {
+  title:"六 · 名 簿",
+  text:
+"你凑近看簿子。\n\n"+
+"每一页写着一个名字、一个生辰、一句很短的话。你飞快地翻：\n\n"+
+"「陈阿宝，五岁。母王氏，抢归。留一魂。」\n"+
+"「周有田，三十一岁。言己名，留。」\n"+
+"「无名，年不详。自入井。留名于纸。」\n\n"+
+"你翻到最后一页。最后一页上写着你的名字，生辰是三十年前的今天，后面那一句只有四个字：\n\n"+
+"「尚未写完」。\n\n"+
+">> 察觉 +2　原来你也不是活人。你是这本簿子上，一个还没写完的条目。",
+  enter:function(){ applyEffects({ins:2, sp:-2, flag:{readBook:true}}); },
+  choices:[
+    { text:"抬头看他", to:"ch3_twin1" },
+    { text:"把簿子上自己那一页撕下来", danger:true, to:"ch3_tear" }
+  ]
+};
+
+SCENES.ch3_tear = {
+  title:"六 · 撕 页",
+  text:
+"你一把抓住自己那一页，往下一撕。\n\n"+
+"纸纹丝不动。你的手指从纸上穿了过去，像穿过一层水。\n\n"+
+"「撕不掉，」灰袍人平静地说，「你还没写完。写完的才撕得掉。」\n\n"+
+"他提起笔，把笔尖悬在你那一页的上方。\n\n"+
+"「你说一句，我就写一句。你说完，我就替你收尾。」",
+  enter:function(){ applyEffects({flag:{triedTear:true}}); },
+  choices:[
+    { text:"「我不说。」", to:"ch3_twin1" },
+    { text:"「你写吧。写完了我好撕。」", to:"ch3_twin1" }
+  ]
+};
+
+SCENES.ch3_flip = {
+  title:"六 · 掀 案",
+  text:
+"你双手抓住石案，用力一掀。\n\n"+
+"石案翻了过去。\n\n"+
+"它落在半空，没有落地。它悬在那里，慢慢旋转，簿子摊在上面，一页一页自己翻着。厅里上千个人同时抬起头。\n\n"+
+"没有脸。\n\n"+
+"上千张没有脸的头，全都朝着你。\n\n"+
+"「你看，」灰袍人摇摇头，「你把他们的名字打散了。」\n\n"+
+"!!命灯 −2　心魂 −3　你听见上千张嘴里同时发出同一个音节，像在骂你，又像在叫你。",
+  enter:function(){ applyEffects({hp:-2, sp:-3, flag:{flipped:true, angry:true}}); },
+  choices:[
+    { text:"退后，听他说话", to:"ch3_twin1" }
+  ]
+};
+
+SCENES.ch3_twin1 = {
+  title:"六 · 他 是 谁",
+  text:
+"「你问我？」他笑了一下，笑得很客气，「我是你留下看家的那一半。」\n\n"+
+"「三十年前你下井，把名字留在了纸上。纸不能没有人守着，所以你把一半留在簿子边；另一半，装进一盏灯里送上去了。」\n\n"+
+"「送上去做什么？」\n\n"+
+"「找个活人来替我。或者说——替我收尾。」他拿起笔，「这三十年，我替你守着一千零十七个名字，替你把村子稳住。你该回来了。」\n\n"+
+"他指指石案前的地上：那里有一个浅浅的凹痕，人的形状。\n\n"+
+"「躺进来，」他说，「灯给我，就这么简单。」",
+  enter:function(){ applyEffects({flag:{twinOffer:true}, ins:1}); },
+  choices:[
+    { text:"「我要是躺进去，会怎样？」", to:"ch3_twin2" },
+    { text:"「我不躺。你才是该躺的那个。」", danger:true, to:"ch3_refuse" },
+    { text:"「你替我守了三百年，累不累？」", req:{ins:5}, to:"ch3_ask_tired", use:"察觉 ≥ 5" },
+    { text:"「阿箬在你手里三十年了。把她先放了。」", req:{flag:"aruFree"}, to:"ch3_demand", use:"阿箬已自由" }
+  ]
+};
+
+SCENES.ch3_ask_tired = {
+  title:"六 · 累 不 累",
+  text:
+"「你替我守了三百年，累不累？」\n\n"+
+"他的笔停在半空。\n\n"+
+"很短的、几乎要散掉的一瞬，他脸上那种客气的笑消失了。他看起来像一个在夜里守了很久的人，守着一个不肯来的接班人。\n\n"+
+"「你怎么知道是三百年？」他问。\n\n"+
+"「因为灯上刻着：一命换一命。你换了三百次。」\n\n"+
+"他把笔放下，看着自己的手。那只手很年轻。\n\n"+
+"「是很累。」他说，「可我不放手，谁替？」\n\n"+
+"!!察觉 +1　心魂 +1　你第一次觉得，他不是鬼，他是一个太尽职的人。",
+  enter:function(){ applyEffects({ins:1, sp:1, flag:{sawTired:true}}); },
+  choices:[
+    { text:"「我可以替你——换个法子。」", req:{ins:6}, to:"ch3_offer_help", use:"察觉 ≥ 6" },
+    { text:"「我不躺。你才是该躺的那个。」", danger:true, to:"ch3_refuse" },
+    { text:"「阿箬先放出来，别的再谈。」", req:{flag:"aruFree"}, to:"ch3_demand", use:"阿箬已自由" }
+  ]
+};
+
+SCENES.ch3_offer_help = {
+  title:"六 · 换 个 法 子",
+  text:
+"「换个法子？」他抬起眼，「三百年来，所有来的人都说要换法子。他们要么想跑，要么想烧，要么想求。」\n\n"+
+"「我不想跑，也不想烧，也不想求。」你说，「我想把名字都放回去。」\n\n"+
+"满厅的灯同时晃了一下。\n\n"+
+"「放回去？放回哪儿？」\n\n"+
+"「放回各人身上。你的簿子只写了名字，没写他们是谁。你把一千个人的名字抄了三百遍，抄到自己都认不出自己的字——所以你要的从来不是我的名字，是一个能替你把这一页写完的人。」\n\n"+
+"他沉默了很久。他把簿子推过来一寸。\n\n"+
+"「那你说，怎么收尾？」\n\n"+
+"!!他第一次，把笔递向了你。",
+  enter:function(){ applyEffects({flag:{twinSoft:true}, ins:1, sp:1}); },
+  choices:[
+    { text:"接过笔", to:"ch5_write" },
+    { text:"不接笔，先问他：「这些名字，你还能认出几个？」", req:{ins:6}, to:"ch3_names", use:"察觉 ≥ 6" }
+  ]
+};
+
+SCENES.ch3_names = {
+  title:"六 · 你认得几个",
+  text:
+"「这些名字，你还能认出几个？」\n\n"+
+"他低头看簿子。手指一行一行往下移，移到某一页停住，抖了一下。\n\n"+
+"「陈阿宝。」他说。\n\n"+
+"「他怎么了？」\n\n"+
+"「他是第一个。五岁，本来该下井的是他。他娘在井边抢回去了。我替了他。」他停了一下，「他后来活了六十岁，有孙子。我在井里数过他们家的灯，年年多一盏。」\n\n"+
+"他把那一页轻轻抚平。\n\n"+
+"「所以我才不能放手。」\n\n"+
+">> 察觉 +1　心魂 +2　你把笔从他手里拿了过来，他没有拦。",
+  enter:function(){ applyEffects({ins:1, sp:2, flag:{twinSoft:true, penTaken:true}}); },
+  choices:[
+    { text:"接下笔", to:"ch5_write" }
+  ]
+};
+
+SCENES.ch3_demand = {
+  title:"六 · 先放人",
+  text:
+"「阿箬在你手里三十年了。先把她放了。」\n\n"+
+"他看了一眼你身后七步远的地方。\n\n"+
+"「她已经不是在我手里了，」他说，「她已经在你手里了。你自己知道那意味着什么。」\n\n"+
+"「什么意思？」\n\n"+
+"「一个人出去，得有一个名字留下来。你带她走，就要有人替你留在这儿。」他把笔尖在簿子上顿了一下，「或者我把你留下，她也一样能走。你自己挑。」\n\n"+
+"!!命灯 −1　你忽然明白他为什么一直那么客气：他不需要强迫你，他只需要你心软。",
+  enter:function(){ applyEffects({hp:-1, flag:{choiceFinal:true}}); },
+  choices:[
+    { text:"「我留下。让她走。」", danger:true, to:"end_return" },
+    { text:"「我不留，也不让她留。我要把这本簿子写完。」", req:{ins:6}, to:"ch5_write", use:"察觉 ≥ 6" },
+    { text:"「我不躺。你才是该躺的那个。」", danger:true, to:"ch3_refuse" }
+  ]
+};
+
+SCENES.ch3_twin2 = {
+  title:"六 · 躺 下 去",
+  text:
+"「我要是躺进去，会怎样？」\n\n"+
+"「你会睡着，」他说，「睡很久。等你醒了，你会穿着一件干净的灰袍，坐在这个位子上，等下一个有灯的人。」\n\n"+
+"「阿箬呢？」\n\n"+
+"「她早就出去了。」\n\n"+
+"「外面的村子呢？」\n\n"+
+"「村子会一直在，」他说得很平静，「灯笼年年有人挂。」\n\n"+
+"你低头看那个凹痕。它很合身，像是照着你做的。\n\n"+
+"!!你怀里的灯，在你胸口烫了一下。",
+  choices:[
+    { text:"躺进去，把灯给他", danger:true, to:"end_keep" },
+    { text:"退开一步：「我想听真话。」", req:{ins:4}, to:"ch3_twin1", use:"察觉 ≥ 4" },
+    { text:"「我不躺。你才是该躺的那个。」", danger:true, to:"ch3_refuse" }
+  ]
+};
+
+SCENES.ch3_refuse = {
+  title:"六 · 我 不 躺",
+  text:
+"「我不躺。你才是该躺的那个。」\n\n"+
+"厅里安静下来。上千盏灯一起变暗，又一起变亮。\n\n"+
+"「我躺？」他把笔搁下，第一次露出一点真的东西——不是笑，是疲惫，「我躺了三十年，是为了让谁站着？你站着回来，第一件事就是叫我躺？」\n\n"+
+"他站起来。他比你高半头。\n\n"+
+"「那就照规矩来。」\n\n"+
+"他抬手一挥。悬空的上千盏灯一起转向你，灯光聚成一条线，直直照在你胸口那盏铜灯上。\n\n"+
+"你听见自己的灯在响。\n\n"+
+"!!命灯 −3　心魂 −2　你必须现在就选：烧，还是给，还是抢。",
+  enter:function(){ applyEffects({hp:-2, sp:-1, flag:{fight:true}}); },
+  choices:[
+    { text:"把灯举起来，反照回去", to:"ch3_burn" },
+    { text:"把灯砸在地上", danger:true, to:"ch3_smash" },
+    { text:"用乌木针扎进自己胸口", req:{item:"zhen"}, to:"ch3_self_needle", use:"乌木针" },
+    { text:"把灯给他", danger:true, to:"end_keep" }
+  ]
+};
+
+SCENES.ch3_burn = {
+  title:"六 · 反 照",
+  text:
+"你把铜灯举过头顶。\n\n"+
+"两道光撞在一起，厅里的上千盏灯一盏接一盏地爆开——不响，只是灭。每一盏灭的时候，下面那个没有脸的人就转过身，朝大门的方向走一步。\n\n"+
+"灰袍人用手挡住脸。他的手背上开始出现皱纹。\n\n"+
+"「你照的是我的灯，」他从牙缝里说，「你也会灭。」\n\n"+
+"你的铜灯开始变小。火苗一截一截往下缩。\n\n"+
+"!!命灯 −2　心魂 −1　但厅里已经空了一半。那些人走出去了。",
+  enter:function(){ applyEffects({hp:-1, sp:-1, ins:1, flag:{burned:true, freedMany:true}}); },
+  choices:[
+    { text:"熄灯，和他谈", to:"ch5_write" },
+    { text:"继续照，把灯烧完", danger:true, to:"ch3_burn_all" }
+  ]
+};
+
+SCENES.ch3_burn_all = {
+  title:"六 · 烧 完",
+  text:
+"你不熄灯。\n\n"+
+"火苗缩到最后一寸的时候，你听见自己的名字在灯里响了一声——像有人在你耳朵里念了一遍，念得很清楚，然后把它收走了。\n\n"+
+"厅里最后的九盏灯也灭了。\n\n"+
+"黑暗里，灰袍人坐在石案的位子上，一动不动。他的脸不再和你一样了——那是一张很老、很疲倦、终于不必再客气的脸。\n\n"+
+"「灯灭了。」他说。\n\n"+
+"「嗯。」\n\n"+
+"「你知道灯灭了会怎样。」\n\n"+
+"「知道。」\n\n"+
+"「那你还照？」\n\n"+
+"「我不照，他们就一直站在这儿。」\n\n"+
+"他笑了一下。这一次是真的笑。\n\n"+
+"!!命灯 −4　所有名字都散了。你也是。",
+  enter:function(){ applyEffects({hp:-3, ins:2, flag:{burnedAll:true, freedAll:true}}); },
+  choices:[
+    { text:"（灯灭了）", to:"ch5_write" }
+  ]
+};
+
+SCENES.ch3_smash = {
+  title:"六 · 砸 灯",
+  text:
+"你把铜灯举起来，往石地上一砸。\n\n"+
+"铜灯没有碎。它在地上弹了一下，滚出去两尺，停住。\n\n"+
+"火苗还亮着，只是歪了。\n\n"+
+"「你砸不碎它，」灰袍人说，「它是你。」\n\n"+
+"你弯腰去捡。手指碰到灯身的一瞬，你看见自己的手——手背上有一层很细的铜绿。\n\n"+
+"!!命灯 −2　你明白了一件事：这盏灯坏了，你就坏了。",
+  enter:function(){ applyEffects({hp:-2, ins:1, flag:{smashed:true}}); },
+  choices:[
+    { text:"把灯捡起来，站起来和他谈", to:"ch5_write" }
+  ]
+};
+
+SCENES.ch3_self_needle = {
+  title:"六 · 扎 自 己",
+  text:
+"你把乌木针扎进自己的胸口。\n\n"+
+"针进去了半寸，你听见一声很轻的、瓷器裂开的声音。\n\n"+
+"从针孔里出来的不是血，是光——青色的光，源源不断。整个厅被这光洗了一遍，上千盏灯全部亮到了极点。\n\n"+
+"灰袍人站起来，第一次露出真正的惊讶。\n\n"+
+"「你把灯里的东西放出来了。」\n\n"+
+"「灯里装的是名字，」你说，「名字该回家。」\n\n"+
+"厅里的人一个接一个转过身。他们有脸了。\n\n"+
+"!!命灯 −3　心魂 +3　乌木针断了。",
+  enter:function(){ applyEffects({hp:-3, sp:3, ins:2, take:"zhen", flag:{released:true, freedMany:true}}); },
+  choices:[
+    { text:"和他谈", to:"ch5_write" }
+  ]
+};
+
+/* ---------- 第四章 · 山道 ---------- */
+SCENES.ch4_road = {
+  title:"七 · 山 道",
+  text:
+"村后的山道很窄，两侧是竹子，竹叶上挂着露水。走了半个时辰，你回头看，村子已经陷在一片白雾里，只有几十点红灯笼还浮在雾上。\n\n"+
+"山道的尽头坐着一个人。\n\n"+
+"灰布道袍，头上有髻，手里提着一盏灯——和你的那盏一模一样。他坐在一块石头上，像是已经等了很久，脚边的地都被坐出了一个坑。\n\n"+
+"「坐。」他拍拍旁边的石头，「我不拦你，我就问两句话。」",
+  choices:[
+    { text:"坐下", to:"ch4_sit" },
+    { text:"不坐，站着听他问", to:"ch4_stand" },
+    { text:"直接走过去，不理他", danger:true, to:"ch4_pass" }
+  ]
+};
+
+SCENES.ch4_pass = {
+  title:"七 · 不 理",
+  text:
+"你从他身边走过去。\n\n"+
+"走了七步，你发现自己站在原处——那块石头，那条山道，那片竹林，又在你前面。\n\n"+
+"你又走了七步。同样的结果。\n\n"+
+"第三次的时候，你听见他在背后说：\n\n"+
+"「你要是走得出去，三十年前就走了。」\n\n"+
+"!!命灯 −1　你退回来，在他旁边坐下。",
+  enter:function(){ applyEffects({hp:-1, flag:{ch4Loop:true}}); },
+  choices:[ { text:"坐下", to:"ch4_sit" } ]
+};
+
+SCENES.ch4_stand = {
+  title:"七 · 站 着",
+  text:
+"你站着，他坐着。他抬头看你，脸上没有不高兴。\n\n"+
+"「站着好，」他说，「站着的人不容易睡着。」\n\n"+
+"他把自己的灯放在地上，往你这边推了一寸。两盏灯挨在一起，火苗朝着一个方向歪，像是互相认识。\n\n"+
+"「第一句，」他说，「你叫什么？」",
+  choices:[
+    { text:"「我叫——」报出自己的名字", danger:true, to:"ch4_sayname" },
+    { text:"「我不告诉你。」", to:"ch4_noname" },
+    { text:"「你先说你自己叫什么。」", req:{ins:4}, to:"ch4_askhim", use:"察觉 ≥ 4" }
+  ]
+};
+
+SCENES.ch4_sit = {
+  title:"七 · 两 盏 灯",
+  text:
+"你在他旁边坐下。石头上有一点余温，是别人的体温。\n\n"+
+"他把手里的灯放在你们中间。两盏灯挨在一起，火苗朝着同一个方向歪。\n\n"+
+"「这村子，」他慢慢说，「已经有三百一十年没有停过灯了。停一次，就有人要死在外面。」\n\n"+
+"「跟我有什么关系？」\n\n"+
+"「关系就是，」他转过头看你，「你是这三十年里，唯一一个把灯带到我面前的人。」\n\n"+
+"「第一句：你叫什么？」",
+  choices:[
+    { text:"「我叫——」报出自己的名字", danger:true, to:"ch4_sayname" },
+    { text:"「我不告诉你。」", to:"ch4_noname" },
+    { text:"「你先说你自己叫什么。」", req:{ins:4}, to:"ch4_askhim", use:"察觉 ≥ 4" },
+    { text:"反问：「你数过多少个带灯来的人？」", req:{ins:5}, to:"ch4_count", use:"察觉 ≥ 5" }
+  ]
+};
+
+SCENES.ch4_count = {
+  title:"七 · 你 数 过 吗",
+  text:
+"「你数过多少个带灯来的人？」\n\n"+
+"他看着竹林，没有立刻回答。\n\n"+
+"「数过。」他说，「一共三百零九个。」\n\n"+
+"「他们都说了名字？」\n\n"+
+"「都说了。」\n\n"+
+"「说了会怎样？」\n\n"+
+"「说了，」他把自己的灯提起来，晃了晃，「灯就归我。人就进去，坐到簿子后面去。三百零九个，一个也没回去过。」\n\n"+
+"他看着你，眼神很平。\n\n"+
+"「你是三百一十个。」\n\n"+
+">> 察觉 +1　心魂 −1",
+  enter:function(){ applyEffects({ins:1, sp:-1, flag:{counted:true}}); },
+  choices:[
+    { text:"「我不告诉你。」", to:"ch4_noname" },
+    { text:"「你先说你叫什么。」", to:"ch4_askhim", req:{ins:4} }
+  ]
+};
+
+SCENES.ch4_askhim = {
+  title:"七 · 他 的 名 字",
+  text:
+"「你先说你自己叫什么。」\n\n"+
+"他的手指在灯身上停了一下。\n\n"+
+"「我记不得了。」他说。\n\n"+
+"「你提了三百一十年灯，把自己的名字弄丢了？」\n\n"+
+"「不是弄丢，」他说得很慢，「是给出去过。每收一个名字，我就得把自己的名字往灯里挪一点。挪到后来，都挪没了。」\n\n"+
+"他把灯提起来，对着灯看了一会儿。青色的火光映在他眼睛里，很空。\n\n"+
+"「所以我才要问你，」他说，「我想听一个还完整的名字。」\n\n"+
+"!!心魂 +1　你第一次觉得他不像鬼。他像一个饿得太久的人，只想闻一下饭味。",
+  enter:function(){ applyEffects({sp:1, ins:1, flag:{hisName:true}}); },
+  choices:[
+    { text:"「我不告诉你。」", to:"ch4_noname" },
+    { text:"「我叫——」报出自己的名字", danger:true, to:"ch4_sayname" },
+    { text:"「我念给你听。念完你就得让我走。」", req:{ins:6}, to:"ch4_deal", use:"察觉 ≥ 6" }
+  ]
+};
+
+SCENES.ch4_deal = {
+  title:"七 · 一 个 买 卖",
+  text:
+"「我念给你听。念完，你让我走。」\n\n"+
+"他想了很久，久到你们中间两盏灯的火苗都矮了半寸。\n\n"+
+"「可以。」他说，「不过规矩是这样：你念完，名字归灯；人归路。你走的时候，会不记得自己念过什么，也不记得自己是谁。走到山下去，你就是一个刚从山里出来、什么都没有的人。」\n\n"+
+"「那我还剩什么？」\n\n"+
+"「剩一条命。」他说，「三百零九个里面，只有一个拿到过这个买卖。」\n\n"+
+"「那个后来怎么样了？」\n\n"+
+"「活到了七十三岁，」他说，「下葬的时候，坟前没有人哭，因为没有人知道他叫什么。」\n\n"+
+">> 记住他这句话。",
+  enter:function(){ applyEffects({flag:{deal:true}, ins:1}); },
+  choices:[
+    { text:"「成。我念。」", danger:true, to:"end_return" },
+    { text:"「不成。名字我要留着。」", to:"ch4_noname" },
+    { text:"「你也把名字给我一半。」", req:{ins:7}, to:"ch4_halves", use:"察觉 ≥ 7" }
+  ]
+};
+
+SCENES.ch4_halves = {
+  title:"七 · 各 一 半",
+  text:
+"「你也把名字给我一半。」\n\n"+
+"他怔住了。他把灯举起来，又放下，反复看了你三遍。\n\n"+
+"「你要我的名？」\n\n"+
+"「你收了我三百年，总得还一点。」\n\n"+
+"他笑了。这一次笑得很短，但很真。\n\n"+
+"「好。我给你一个音。」他把手放在灯上，「你上去以后，去祠堂，把那本村志最后一页补上。补完，我的那半个名，就成了那个村子的名字。」\n\n"+
+"「村子叫什么？」\n\n"+
+"「随便你。」他说，「名字这东西，本来就不是自己起的。」\n\n"+
+"!!你得到了一个音：『lù』。它在你舌根上，很凉。",
+  enter:function(){ applyEffects({flag:{gotSound:true, deal:true}, ins:2, sp:2}); },
+  choices:[
+    { text:"「那我的名字呢？」", to:"ch4_halves2" }
+  ]
+};
+
+SCENES.ch4_halves2 = {
+  title:"七 · 你 的 名 字",
+  text:
+"「那我的名字呢？」\n\n"+
+"「你的名字，你自己决定给不给。」他站起来，把石头上的温度让给你，「我给你指一条别的路：你去祠堂，把村志补完，把井口那盏人形灯点上。灯一亮，这一村的名字都要走一遍账。谁的账平了，谁就散了。」\n\n"+
+"「散是什么意思？」\n\n"+
+"「就是不必再有人守着。」\n\n"+
+"他看着山下的雾。\n\n"+
+"「你要是能把账做平，我就不用再坐在这块石头上。你也可以走。走的时候，你记得多少，算你的本事。」",
+  enter:function(){ applyEffects({flag:{finalPath:true}, ins:1}); },
+  choices:[
+    { text:"「我做。」下山回村", to:"ch5_write" }
+  ]
+};
+
+SCENES.ch4_sayname = {
+  title:"七 · 说 出 名 字",
+  text:
+"你张开嘴，报出自己的名字。\n\n"+
+"你说了。你听得很清楚，你说了一个完整、干净、三个字的名字。\n\n"+
+"说完之后，四下里静得可怕。\n\n"+
+"竹子不响了。露水停在半空。你旁边那盏灯的火苗，直直地立住了。\n\n"+
+"「好名字。」灰袍人轻声说。\n\n"+
+"他把手伸过来，从你胸口把铜灯摘了下去——你没有看见他怎么摘的，就像从他自己的口袋里拿东西一样自然。\n\n"+
+"灯到了他手里。你的胸口空了。\n\n"+
+"!!命灯 归 0　你听见自己的名字被写进一本很远处的簿子里。",
+  enter:function(){ applyEffects({hp:-99, flag:{toldName:true}}); },
+  choices:[
+    { text:"（倒下去）", to:"end_lamp_out" }
+  ]
+};
+
+SCENES.ch4_noname = {
+  title:"七 · 缄 口",
+  text:
+"「我不告诉你。」\n\n"+
+"他看了你很久。然后他点点头，站起来，把路让开。\n\n"+
+"「那你走罢。」\n\n"+
+"你走了几步，他在背后说：\n\n"+
+"「你缄口，我收不了你的名。可我告诉你一件事——山下的雾，每夜往上爬一尺。你不解决这一村的事，你走出去，也是在雾里走。」\n\n"+
+"他坐回石头上。\n\n"+
+"「我等你回来。」\n\n"+
+">> 察觉 +1　心魂 +1　你下山了。",
+  enter:function(){ applyEffects({ins:1, sp:1, flag:{refusedName:true, revealed:0}}); },
+  choices:[
+    { text:"下山回村", to:"ch5_write" },
+    { text:"先不回村，在山道上问最后一件事", req:{ins:5}, to:"ch4_lastq", use:"察觉 ≥ 5" }
+  ]
+};
+
+SCENES.ch4_lastq = {
+  title:"七 · 最 后 一 问",
+  text:
+"「最后一件事，」你回头，「这盏灯，是什么时候点着的？」\n\n"+
+"他没有回头。\n\n"+
+"「三百一十年前，」他说，「一个外乡人走到这个村子，村里人在打仗，全死光了。他一个人点了满村的灯，想把他们的名字留住。」\n\n"+
+"「后来呢？」\n\n"+
+"「后来他发现，留名字不难。难的是——点灯的人不能走。」\n\n"+
+"他把自己的灯提起来，让你看灯座。灯座上刻着两个字，刻得很深，笔画很旧：\n\n"+
+"「灯下」。\n\n"+
+">> 察觉 +2　心魂 −1　你终于知道了村子的名字——不是没有名字，是名字本身就是一句咒。",
+  enter:function(){ applyEffects({ins:2, sp:-1, flag:{knowVillageName:true}}); },
+  choices:[
+    { text:"下山回村", to:"ch5_write" }
+  ]
+};
+
+/* ---------- 第五章 · 认名 ---------- */
+SCENES.ch5_write = {
+  title:"八 · 认 名",
+  text:
+"你回到村里。\n\n"+
+"天又要亮了。灯笼一盏一盏熄下去，熄到最后一盏的时候，整个村子忽然变得很干净——干净得像一张还没写字的纸。\n\n"+
+"祠堂的门大开着。案上那本村志翻在第三十页，缺的半页空在那儿，边缘翘着，像在等人。\n\n"+
+"西头那盏人形铜灯，也自己亮了起来，火很小，很稳。\n\n"+
+"你现在可以做得不多了：写，或者不写。",
+  enter:function(){ applyEffects({flag:{finalScene:true}}); },
+  choices:function(){
+    return [
+      { text:"把村志补完：写下你自己的名字", danger:true, to:"fin_write_self" },
+      { text:"把村志补完：写下阿箬的名字", to:"fin_write_aruo", req:{flag:"aruWish"} },
+      { text:"在村志上写下一个新名字：『灯下』", req:{flag:"gotSound"}, to:"fin_write_village", use:"你有一个音：lù" },
+      { text:"把祠堂的三百零一个牌位全部翻过来", danger:true, to:"fin_flip_tablets" },
+      { text:"用青铜镜照一照案上的村志", req:{item:"tongjing"}, to:"fin_mirror", use:"青铜小镜" },
+      { text:"把身上那包药嚼了（定一定神）", req:{item:"yao"}, to:"fin_eat_yao", use:"当归远志" },
+      { text:"去井口，点起那盏人形灯", to:"fin_light_lamp" },
+      { text:"什么都不写，就此转身走出村子", to:"fin_walk_away" },
+      { text:"回到山道，把名字交给那个道士", req:{flag:"counted"}, to:"end_return", use:"你已想清楚" }
+    ];
+  }
+};
+
+SCENES.fin_write_self = {
+  title:"八 · 写 下 自 己",
+  text:
+"你提起笔，在空白的半页上写下自己的名字。\n\n"+
+"墨一落到纸上，就自己洇开了。名字慢慢化成一团黑，黑里浮出一行新的字，像是早有人替你写好：\n\n"+
+"「第三百一十条。守灯。」\n\n"+
+"你的手开始变冷。你抬头看，祠堂以外，村子里的灯笼一盏一盏重新亮起来，红得像从来没熄过。\n\n"+
+"你身后的阿箬轻轻“啊”了一声。\n\n"+
+"!!命灯 −5\n"+
+">> 你成了这村子的下一个守灯人。",
+  enter:function(){ applyEffects({hp:-5, flag:{becameKeeper:true}}); },
+  choices:[
+    { text:"（笔从手里落下）", to:"end_keep" }
+  ]
+};
+
+SCENES.fin_write_aruo = {
+  title:"八 · 写 下 阿 箬",
+  text:
+"你提笔写下两个字：阿箬。\n\n"+
+"字落在纸上，纸立刻湿了一片，像是有人在纸上哭。\n\n"+
+"阿箬从你身后走过来。她走过你身边的时候，手背擦到了你的袖子——有温度。\n\n"+
+"「你写了我。」她说。\n\n"+
+"「嗯。」\n\n"+
+"「那你呢？」\n\n"+
+"「我没写。」\n\n"+
+"她站在案前，看着那两个字看了很久，然后抬起头。她的眼眶里，第一次有了不是空的东西。\n\n"+
+"「你把自己的名字让给我了，是不是？」\n\n"+
+"你没有回答。\n\n"+
+"祠堂外的天亮了。第一缕光照进来的时候，阿箬往门外走。走了三步，回过头，很认真地对你说了三个字——那是你的名字。说完，她就不见了。\n\n"+
+"!!命灯 −3　心魂 +3\n"+
+">> 她记得你的名字。你知道，只要她还记得，你就没有真正消失。",
+  enter:function(){ applyEffects({hp:-3, sp:3, flag:{wroteAruo:true, aruFree:true}}); },
+  choices:[
+    { text:"（走出祠堂）", to:"end_return" }
+  ]
+};
+
+SCENES.fin_write_village = {
+  title:"八 · 给 村 子 一 个 名 字",
+  text:
+"你把那个音写在纸上。\n\n"+
+"你写的时候，手很稳。写完，纸上只有一个字：\n\n"+
+"# 麓\n\n"+
+"字一出现，祠堂里所有的牌位同时响了一声，像有很多人在同一瞬间直起腰。\n\n"+
+"村志的最后一页，自己浮出一行小字：\n\n"+
+"「麓村。三百一十一人。某年，灯停。」\n\n"+
+"西头那盏人形铜灯突然大亮。整个村子被照得像白天——不是灯笼那种红，是很干净的、傍晚的光。\n\n"+
+"你听见远远的地方，有孩子笑。\n\n"+
+"你回头，祠堂门口站着一个人，灰布道袍，手里没有灯了，脸也不再和你一样。他朝你拱了拱手：\n\n"+
+"「那就这样罢。」\n\n"+
+"!!心魂 +4　命灯 +1\n"+
+">> 三百一十年的账，在这一页上做平了。",
+  enter:function(){ applyEffects({sp:4, hp:1, ins:2, flag:{villageNamed:true, freedAll:true}}); },
+  choices:[
+    { text:"（走出祠堂）", to:"end_free" }
+  ]
+};
+
+SCENES.fin_flip_tablets = {
+  title:"八 · 三 百 零 一 个 名 字",
+  text:
+"你走到牌位墙前，伸手把最下面那一层的第一块牌位翻过来。\n\n"+
+"牌位背面刻着一行很小的字，是那个人自己写的：\n\n"+
+"「陈阿宝，五岁。我娘把我抱回去了，我活了六十年。谢谢。」\n\n"+
+"你翻第二块：「周有田，三十一岁。我不该说名字。我认。」\n\n"+
+"第三块：「无名。我自愿来的。别找我。」\n\n"+
+"你一块一块往上翻。翻到第一百多块的时候，你的手已经抬不起来了。你跪在牌位墙下面，一块一块，一直翻到天亮。\n\n"+
+"三百零一块牌位，背面全都有字。\n\n"+
+"那不是给活人看的。那是他们留给自己的一句话。\n\n"+
+"天亮的时候，整个祠堂安静得能听见灰尘落地的声音。你从来没有这么累过，也从来没有这么踏实过。\n\n"+
+"!!命灯 −2　心魂 +5\n"+
+">> 你把三百零一个人，从“牌位”变回了“人”。",
+  enter:function(){ applyEffects({hp:-2, sp:5, ins:2, flag:{flippedAll:true, freedMany:true}}); },
+  choices:[
+    { text:"（走出祠堂）", to:"end_free" }
+  ]
+};
+
+SCENES.fin_light_lamp = {
+  title:"八 · 点 灯",
+  text:
+"你走到西头，站在那盏人形铜灯前。\n\n"+
+"灯座的脸还是你的脸。你看了它一会儿，然后蹲下去，把自己胸口那盏灯里的灯芯抽出来，放进人形灯手里的空盘。\n\n"+
+"火着了。\n\n"+
+"不是青色，是暖的橘色，像屋子里烧的灶火。\n\n"+
+"光散开的时候，你听见村子响了一声——不是灯笼，是人声。几百个人的声音，在屋里说话、在井边打水、在田里喊孩子回家吃饭。\n\n"+
+"你转头看。石板路上有影子在走，屋檐下有人在晒衣服。\n\n"+
+"他们都看不见你。\n\n"+
+"阿箬站在你旁边，看了一会儿，说：\n\n"+
+"「原来我们家以前是这样的。」\n\n"+
+"「嗯。」\n\n"+
+"灯烧了整整一夜。天亮的时候，灯盘里只剩下一点灰。\n\n"+
+"!!命灯 −3　心魂 +4\n"+
+">> 你把三十年前那个晚上，还给了这个村子。",
+  enter:function(){ applyEffects({hp:-3, sp:4, ins:2, take:"bijian", flag:{litVillageLamp:true, freedMany:true}}); },
+  choices:[
+    { text:"（走进晨光里）", to:"end_free" }
+  ]
+};
+
+SCENES.fin_walk_away = {
+  title:"八 · 走 出 去",
+  text:
+"你把笔放下，转身出门。\n\n"+
+"村子里雾很重。你沿着来时的路往东走，走过客栈、走过破庙，走过那只黑猫蹲过的草堆。\n\n"+
+"你一直走。走到日头偏西，回头看——村子不见了，只有一片很普通的山。\n\n"+
+"你身上什么都没有了。没有灯，没有名字，只有一条命。\n\n"+
+"你在山下的镇子里找了份活干。过了几年，有人问你姓什么，你说不出来。他们就叫你「老灯」。\n\n"+
+"有一天夜里，你梦见一口井。井边站着一个孩子，手里转着陀螺。她没有回头，只问了一句：\n\n"+
+"「你怎么走了？」\n\n"+
+"你在梦里想回答，可你什么也说不出来。\n\n"+
+"!!心魂 −3",
+  enter:function(){ applyEffects({sp:-3, flag:{walkedAway:true}}); },
+  choices:[
+    { text:"（醒来）", to:"end_walk" }
+  ]
+};
+
+SCENES.fin_mirror = {
+  title:"八 · 镜 中 之 后",
+  text:
+"你把青铜镜举到村志上方。\n\n"+
+"镜子里，第三十页是完整的。缺的那半页上写着：\n\n"+
+"「……具名于册。灯熄，名散；灯存，名留。凡留名者，须有一人守之。守者之名，不入册。」\n\n"+
+"最后一行更小，像是后来补的：\n\n"+
+"「守者可以换。换法：须有活人自愿，且知其为守。」\n\n"+
+"你把镜子放下。你终于知道自己站在哪一步上了——你是这三百年里，第一个被明明白白告知规矩的人。\n\n"+
+">> 察觉 +2　心魂 +2　从此以后，你做什么选择，都是你自己选的。",
+  enter:function(){ applyEffects({ins:2, sp:2, flag:{knowRule:true, mirrorRead:true}}); },
+  choices:function(){
+    return [
+      { text:"把村志补完：写下你自己的名字", danger:true, to:"fin_write_self" },
+      { text:"把村志补完：写下阿箬的名字", to:"fin_write_aruo", req:{flag:"aruWish"} },
+      { text:"在村志上写下一个新名字：『灯下』", req:{flag:"gotSound"}, to:"fin_write_village", use:"你有一个音：lù" },
+      { text:"把祠堂的三百零一个牌位全部翻过来", danger:true, to:"fin_flip_tablets" },
+      { text:"去井口，点起那盏人形灯", to:"fin_light_lamp" },
+      { text:"什么都不写，就此转身走出村子", to:"fin_walk_away" }
+    ];
+  }
+};
+
+SCENES.fin_eat_yao = {
+  title:"八 · 一 包 药",
+  text:
+"你在祠堂门槛上坐下来，把那包当归远志嚼了。\n\n"+
+"苦。苦过之后是回甘，从舌根一路热到胸口。你怀里的灯稳住了，火苗直直地立着，不再抖。\n\n"+
+"你坐了一会儿。门外天快亮了，村子很安静，安静得能听见远处的鸡叫——你已经很多年没听见鸡叫了。\n\n"+
+"你站起来，把药包的空纸折好，塞进袖子。\n\n"+
+">> 命灯 +3　心魂 +1",
+  enter:function(){ applyEffects({hp:3, sp:1, take:"yao"}); },
+  choices:function(){
+    return [
+      { text:"把村志补完：写下你自己的名字", danger:true, to:"fin_write_self" },
+      { text:"把村志补完：写下阿箬的名字", to:"fin_write_aruo", req:{flag:"aruWish"} },
+      { text:"在村志上写下一个新名字：『灯下』", req:{flag:"gotSound"}, to:"fin_write_village", use:"你有一个音：lù" },
+      { text:"把祠堂的三百零一个牌位全部翻过来", danger:true, to:"fin_flip_tablets" },
+      { text:"去井口，点起那盏人形灯", to:"fin_light_lamp" },
+      { text:"什么都不写，就此转身走出村子", to:"fin_walk_away" }
+    ];
+  }
+};
+
+/* ---------------- 结局 ---------------- */
+function endStep(){
+  // 进入结局时不再因灯灭/失魂被强制改写结局
+  if(P.hp < 1) P.hp = 1;
+  if(P.sp < 1) P.sp = 1;
+  renderHud();
+}
+function markEnd(key){
+  P.endings[key] = true;
+  try{ localStorage.setItem(KEY_END, JSON.stringify(P.endings)); }catch(e){}
+}
+function backToStart(){
+  var e = P.endings;
+  P = freshState();
+  P.endings = e;
+  return "prologue";
+}
+function endingScene(id, key, tag, name, recap){
+  SCENES[id] = {
+    title:"终 · " + name,
+    ending:true,
+    enter:endStep,
+    text:function(){
+      markEnd(key);
+      return "!!" + tag + "\n\n" + recap;
+    },
+    choices:[
+      { text:"回到破庙，从头再走一遍", to:backToStart },
+      { text:"查看我为这一村做的事", to:function(){ showStatus(); return P.node; } }
+    ]
+  };
+}
+
+SCENES.end_lamp_out = {
+  title:"终 · 灯 灭",
+  ending:true,
+  enter:endStep,
+  text:function(){
+    markEnd("end_lamp_out");
+    return "!!结局 · 灯灭\n\n"+
+    "# 灯 灭\n\n"+
+    "你胸口那点火，缩成了针尖大小，然后没有了。\n\n"+
+    "不疼。只是很冷，从心口往外冷，冷到指尖的时候，你听见有人在很远的地方念了一个名字——不是你的名字，可你听着，觉得那应该就是你的。\n\n"+
+    "你倒在一个没有名字的村子里。祠堂的牌位墙上，最下面那一层，多出一块新的木牌。\n\n"+
+    "墨迹还没干。\n\n"+
+    "!!（你在第 " + P.steps + " 步熄了自己的灯。）";
+  },
+  choices:[
+    { text:"回到破庙，从头再走一遍", to:backToStart },
+    { text:"查看我为这一村做的事", to:function(){ showStatus(); return P.node; } }
+  ]
+};
+
+SCENES.end_mad = {
+  title:"终 · 失 魂",
+  ending:true,
+  enter:endStep,
+  text:function(){
+    markEnd("end_mad");
+    return "!!结局 · 失魂\n\n"+
+    "# 失 魂\n\n"+
+    "你还在走，灯还亮着，可你已经分不清哪一个是自己了。\n\n"+
+    "有时候你是那个站在柜台后擦碗的人，有时候你是井底转陀螺的孩子，有时候你是山道上提灯的道士。\n\n"+
+    "你在村子里走了很多年，见人就问：你叫什么？\n\n"+
+    "有人问你叫什么，你很认真地想，然后笑一笑，说：记不清了。\n\n"+
+    "后来村里人都认得你。他们叫你——灯下人。\n\n"+
+    "!!（你的心魂熬不住了。）";
+  },
+  choices:[
+    { text:"回到破庙，从头再走一遍", to:backToStart },
+    { text:"查看我为这一村做的事", to:function(){ showStatus(); return P.node; } }
+  ]
+};
+
+SCENES.end_keep = {
+  title:"终 · 留 名",
+  ending:true,
+  enter:endStep,
+  text:function(){
+    markEnd("end_keep");
+    var line = P.flags.gaveName
+      ? "你连自己的名字都留在了井底。"
+      : "你把自己的名字，也一并写进了簿子。";
+    var head = P.flags.becameKeeper
+      ? "笔从你手里落下的时候，你听见屋外第一声鸡叫。那声鸡叫很旧，像是三十年前录下来的。"
+      : "你躺进那个凹痕里。石地很凉，很合身，像是量过你的尺寸。";
+    return "!!结局 · 留名\n\n"+
+    "# 留 名\n\n"+
+    head + "\n\n"+
+    "灰袍人把铜灯接过去，举在手里看了很久，然后轻轻吹了一口气。\n\n"+
+    "灯芯亮了一瞬，就暗了。厅里上千盏灯同时低下去一寸——那是他们在向新来的守灯人弯腰。\n\n"+
+    line + "\n\n"+
+    "你从祠堂走出来，看着村子里一盏一盏重新亮起的红灯笼，忽然明白了掌柜的为什么天天擦那只空碗——擦碗不是等人的，是让手上有事做。\n\n"+
+    "你回到客栈，从柜台下面拿出抹布，坐在掌柜坐过的位子上，开始擦一只空碗。\n\n"+
+    "擦到第七遍的时候，门开了，一个提着青灯的人站在门口，浑身是雨。\n\n"+
+    "你抬起头。你的眼睛很干净。\n\n"+
+    "「客官，」你说，「住店，还是问路？」\n\n"+
+    "!!（你成了第三百一十个守灯人。）";
+  },
+  choices:[
+    { text:"回到破庙，从头再走一遍", to:backToStart },
+    { text:"查看我为这一村做的事", to:function(){ showStatus(); return P.node; } }
+  ]
+};
+
+SCENES.end_return = {
+  title:"终 · 无 名",
+  ending:true,
+  enter:endStep,
+  text:function(){
+    markEnd("end_return");
+    var why = P.flags.wroteAruo
+      ? "你没有写下自己。你只写了两个字：阿箬。"
+      : "你把名字念了出来。";
+    var aru = P.flags.wroteAruo
+      ? "她走的时候，往门外回头，很认真地对你说了三个字——那是你的名字。只要她还记得，你就没有真正消失。"
+      : (P.flags.aruFree
+        ? "阿箬站在村口看着你走。她手里有鞋，有陀螺。她张了张嘴，好像要叫你，可她也没有你的名字了。"
+        : "井口浮起一层水，水里映着一个转陀螺的孩子。她抬头看了你一眼，又低下头去。");
+    return "!!结局 · 无名\n\n"+
+    "# 无 名\n\n"+
+    why + "\n\n"+
+    "念完（写完）之后，四下里静极了。然后是很长的一觉——没有梦，没有声音，像掉进一层温水。\n\n"+
+    aru + "\n\n"+
+    "你醒来的时候，躺在一座破庙的门槛上。\n\n"+
+    "屋梁上挂着半截蛛网，网里裹着一只死去的飞蛾。香案倒了，泥塑的神像少了半张脸。\n\n"+
+    "你坐起来，摸了摸胸口——什么都没有。\n\n"+
+    "你想不起来自己要去哪儿，也想不起来自己是谁。你只记得，山里有一个村子；村里的灯笼，红得像有人把整面墙浸进了血里。\n\n"+
+    "你站起来，往山里走。你走得很稳。你想，总要去看一眼的。\n\n"+
+    "!!（你活下来了，代价是你不再是你。）";
+  },
+  choices:[
+    { text:"回到破庙，从头再走一遍", to:backToStart },
+    { text:"查看我为这一村做的事", to:function(){ showStatus(); return P.node; } }
+  ]
+};
+
+SCENES.end_walk = {
+  title:"终 · 雾 中",
+  ending:true,
+  enter:endStep,
+  text:function(){
+    markEnd("end_walk");
+    return "!!结局 · 雾中\n\n"+
+    "# 雾 中\n\n"+
+    "你没有写，也没有点灯。你只是走出了祠堂，走出了村口。\n\n"+
+    "你在山下的镇子里活了很多年，别人叫你「老灯」。\n\n"+
+    "你娶了一个寡妇，养了两个不是你的孩子。你从来不说梦话——你怕自己说了什么，会把他们也带进山里去。\n\n"+
+    "六十岁那年，你得了病，躺了三个月。临走那天夜里，你忽然能说话了，你抓着床边人的手，想说一个名字。\n\n"+
+    "你张着嘴，说了很久。\n\n"+
+    "屋里的人听着，只听见几个很轻的音：「……灯下……有人……」\n\n"+
+    "你走的时候，窗外起了雾。雾一直往山上爬。\n\n"+
+    "!!（你没有解决任何事，可你活成了一个普通人。）";
+  },
+  choices:[
+    { text:"回到破庙，从头再走一遍", to:backToStart },
+    { text:"查看我为这一村做的事", to:function(){ showStatus(); return P.node; } }
+  ]
+};
+
+SCENES.end_free = {
+  title:"终 · 出 村",
+  ending:true,
+  enter:endStep,
+  text:function(){
+    markEnd("end_free");
+    var line1 = P.flags.villageNamed
+      ? "村子有了名字：麓。有名字的地方，就有人找得到，也有人回得来。"
+      : (P.flags.litVillageLamp
+        ? "你把灯留在了井口。那盏灯现在还亮着，暖的，像灶火。你走的时候，替你守着村子的是一盏灶火，不是一盏鬼火。"
+        : (P.flags.flippedAll
+          ? "祠堂里三百零一块牌位，背面都留着他们自己的一句话。他们是人了，不再是牌位。"
+          : (P.flags.knowRule
+            ? "你没有改写村志，可你把规矩看清楚了。从今往后，守灯的人是自愿的——这在三百一十年里是头一回。"
+            : "村里那一晚的灯笼，熄得干干净净，没有一盏留到天亮。")));
+    var line2 = P.flags.aruFree
+      ? "阿箬在你前面走着。她走得不快，时不时回头看你一眼，怕你落下。她的鞋在脚上，陀螺揣在怀里。她还没有名字用——她说，等走到有人的地方，她要自己起一个。"
+      : "你一个人走出山口。身后的雾没有跟上来。";
+    return "!!结局 · 出村\n\n"+
+    "# 出 村\n\n"+
+    "你走出山口的时候，天刚亮。\n\n"+
+    "雾停在村子那一侧，像有人在山口拉了一道帘子。你回头看，只看见一片很普通的山，山脚下有几点极淡的红，天一亮就没了。\n\n"+
+    line1 + "\n\n"+
+    line2 + "\n\n"+
+    "你走下坡的时候，忽然发现自己记得自己的名字了。\n\n"+
+    "你没有说出来。你只是把它含在嘴里，一路含着，走到镇上，走到有人烟的地方。\n\n"+
+    "!!（你把一个村子，从灯下还给了白天。）";
+  },
+  choices:[
+    { text:"回到破庙，从头再走一遍", to:backToStart },
+    { text:"查看我为这一村做的事", to:function(){ showStatus(); return P.node; } }
+  ]
+};
+
+/* ---------------- 启动 ---------------- */
+renderHud();
+goto("prologue");
+if(!Object.keys(P.endings).length){
+  setTimeout(showAbout, 500);
+}
+
+})();
+</script>
+</body>
+</html>
